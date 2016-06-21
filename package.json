@@ -1,0 +1,19 @@
+{
+  "name": "ims-shared-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gatewayapps/ims-shared-core.git"
+  },
+  "author": "Daniel Gary <daniel@gatewayapps.com> (http://www.gatewayapps.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gatewayapps/ims-shared-core/issues"
+  },
+  "homepage": "https://github.com/gatewayapps/ims-shared-core#readme"
+}
