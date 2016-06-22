@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/gatewayapps/ims-shared-core/issues"
   },
-  "homepage": "https://github.com/gatewayapps/ims-shared-core#readme"
+  "homepage": "https://github.com/gatewayapps/ims-shared-core#readme",
+  "dependencies": {
+    "google-libphonenumber": "^1.0.22"
+  }
 }
