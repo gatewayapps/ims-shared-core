@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/gatewayapps/ims-shared-core#readme",
   "dependencies": {
-    "google-libphonenumber": "^1.0.22"
+    "google-libphonenumber": "^1.0.22",
+    "sequelize": "^3.24.0",
+    "tedious": "^1.14.0"
   }
 }
