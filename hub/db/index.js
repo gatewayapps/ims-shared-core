@@ -5,7 +5,7 @@ const Database = require('../../database');
 class HubDatabase {
   constructor(config) {
 
-    this.context = new Database(config, config.hubDatabaseName);
+    this.context = Database(config, config.hubDatabaseName);
 
     this.Equipment = require('./equipment')(Sequelize, this.context);
     this.EquipmentType = require('./equipmentType')(Sequelize, this.context);
