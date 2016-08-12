@@ -8,8 +8,8 @@ class Hub {
     this.db = undefined;
   }
 
-  init(database, username, password, server, instanceName) {
-    this.db = new HubDatabase(database, username, password, server, instanceName); 
+  init(config) {
+    this.db = new HubDatabase(config); 
   }
 
   _isInitialized() {

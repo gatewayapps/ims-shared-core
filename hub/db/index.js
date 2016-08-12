@@ -1,29 +1,11 @@
 "use strict";
 const Sequelize = require('sequelize');
+const Database = require('../../database');
 
 class HubDatabase {
-  constructor(database, username, password, server, instanceName) {
-    this.context = new Sequelize(database, username, password, {
-      host: server,
-      dialect: 'mssql',
-      dialectOptions: {
-        instanceName: instanceName,
-        requestTimeout: 300000
-      },
-      options: {
-        retry: {
-          max: 3
-        }
-      },
-      pool: {
-        max: 5,
-        min: 0,
-        idle: 10000
-      },
-      define: {
-        timestamps: false
-      },
-    });
+  constructor(config) {
+
+    this.context = new Database(config, config.hubDatabaseName);
 
     this.Equipment = require('./equipment')(Sequelize, this.context);
     this.EquipmentType = require('./equipmentType')(Sequelize, this.context);
@@ -37,7 +19,7 @@ class HubDatabase {
     this.PackageRolePermission = require('./packageRolePermission')(Sequelize, this.context);
     this.Tree = require('./tree')(Sequelize, this.context);
     this.UserAccount = require('./userAccount')(Sequelize, this.context);
- 
+
     /*******************************************
      * Define relations between models
      ******************************************/
@@ -47,11 +29,11 @@ class HubDatabase {
 
     // Node to NodeClosure ancestor
     this.Node.hasMany(this.NodeClosure, { as: 'descendants', foreignKey: 'ancestor' });
-    this.NodeClosure.belongsTo(this.Node, { as: 'ancestorNode', foreignKey: 'ancestor'});
+    this.NodeClosure.belongsTo(this.Node, { as: 'ancestorNode', foreignKey: 'ancestor' });
 
     // Node to NodeClosure descendant
     this.Node.hasMany(this.NodeClosure, { as: 'ancestors', foreignKey: 'descendant' });
-    this.NodeClosure.belongsTo(this.Node, { as: 'descendantNode', foreignKey: 'descendant'});
+    this.NodeClosure.belongsTo(this.Node, { as: 'descendantNode', foreignKey: 'descendant' });
 
     // PackageRole to PackageRolePermission
     this.PackageRole.hasMany(this.PackageRolePermission, { as: 'permissions', foreignKey: 'packageRoleId' });
