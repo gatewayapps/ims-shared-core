@@ -4,6 +4,7 @@ var instances = {};
 
 module.exports = (config, databaseNameOverride) => {
     var dbName = databaseNameOverride || process.env.DATABASE_NAME || config.databaseName;
+    console.log(`Trying to login to ${dbName}`);
     if (!instances[dbName]) {
         instances[dbName] = new Sequelize(dbName,
             process.env.LOGIN_USERNAME || config.username,
@@ -11,7 +12,7 @@ module.exports = (config, databaseNameOverride) => {
                 host: process.env.DATABASE_SERVER || config.server,
                 dialect: 'mssql',
                 dialectOptions: {
-                    instanceName: process.env.DATABASE_INSTANCE_NAME || process.instanceName,
+                    instanceName: process.env.DATABASE_INSTANCE_NAME || config.instanceName,
                     requestTimeout: 300000
                 },
                 pool: {
