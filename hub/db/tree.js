@@ -8,6 +8,9 @@ module.exports = (Sequelize, dbContext) => {
       type: Sequelize.STRING(100),
       allowNull: false,
     },
+    shortCode: {
+      type: Sequelize.STRING(5)
+    },
   }, {
     tableName: 'Trees',
   });

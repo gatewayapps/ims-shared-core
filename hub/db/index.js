@@ -27,6 +27,10 @@ class HubDatabase {
     this.NodeType.hasMany(this.Node, { foreignKey: 'nodeTypeId' });
     this.Node.belongsTo(this.NodeType, { foreignKey: 'nodeTypeId' });
 
+    // Node to Tree
+    this.Tree.hasMany(this.Node, { foreignKey: 'treeId' });
+    this.Node.belongsTo(this.Tree, { foreignKey: 'treeId' });
+
     // Node to NodeClosure ancestor
     this.Node.hasMany(this.NodeClosure, { as: 'descendants', foreignKey: 'ancestor' });
     this.NodeClosure.belongsTo(this.Node, { as: 'ancestorNode', foreignKey: 'ancestor' });
