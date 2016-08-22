@@ -29,6 +29,9 @@ module.exports = (Sequelize, dbContext) => {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    supervisorNodeId: {
+      type: Sequelize.INTEGER,
+    },
     isDeleted: {
       type: Sequelize.BOOLEAN,
       allowNull: false,
