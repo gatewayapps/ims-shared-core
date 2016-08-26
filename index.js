@@ -2,8 +2,12 @@
 
 const constants = require('./lib/constants');
 const phoneNumberUtils = require('./lib/phoneNumberUtils');
+const PermissionHandler = require('./lib/PermissionHandler');
+const TreeHelper = require('./lib/TreeHelper');
 
 module.exports = {
     Constants: constants,
-    PhoneNumberUtils: phoneNumberUtils
+    PermissionHandler: PermissionHandler,
+    PhoneNumberUtils: phoneNumberUtils,
+    TreeHelper: TreeHelper,
 };
