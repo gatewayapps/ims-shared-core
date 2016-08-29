@@ -29,7 +29,7 @@ module.exports = (Sequelize, dbContext) => {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
-    supervisorNodeId: {
+    ownerNodeId: {
       type: Sequelize.INTEGER,
     },
     isDeleted: {
