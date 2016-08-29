@@ -3,16 +3,16 @@ const Sequelize = require('sequelize');
 var instances = {};
 
 module.exports = (config, databaseNameOverride) => {
-    var dbName = databaseNameOverride || process.env.DATABASE_NAME || config.databaseName;
+    var dbName = databaseNameOverride || config.databaseName;
     console.log(`Trying to login to ${dbName}`);
     if (!instances[dbName]) {
         instances[dbName] = new Sequelize(dbName,
-            process.env.LOGIN_USERNAME || config.username,
-            process.env.LOGIN_PASSWORD || config.password, {
-                host: process.env.DATABASE_SERVER || config.server,
+            config.username,
+            config.password, {
+                host: config.server,
                 dialect: 'mssql',
                 dialectOptions: {
-                    instanceName: process.env.DATABASE_INSTANCE_NAME || config.instanceName,
+                    instanceName: config.instanceName,
                     requestTimeout: 300000
                 },
                 pool: {

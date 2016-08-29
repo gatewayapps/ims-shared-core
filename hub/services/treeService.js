@@ -15,10 +15,27 @@ const NODE_DETAIL_TYPES = {
 module.exports = {
   nodeDetailTypes: NODE_DETAIL_TYPES,
   trees: TREES,
+  getParentsObject: getParentsObject,
   getStructuredTree: getStructuredTree,
 }
 
+function getParentsObject(db) {
+  return db.Node.findAll({
+      attributes: [
+        'nodeId',
+        'parent'
+      ]
+    })
+    .then(nodes => {
+      const parentObj = {};
 
+      nodes.forEach(n => {
+        parentObj[n.nodeId] = n.parent
+      });
+
+      return parentObj;
+    });
+}
 
 function getStructuredTree(db, treeNameOrId) {
   let treeId = 0;
