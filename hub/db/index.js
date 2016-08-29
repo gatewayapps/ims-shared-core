@@ -40,7 +40,7 @@ class HubDatabase {
     this.NodeClosure.belongsTo(this.Node, { as: 'descendantNode', foreignKey: 'descendant' });
 
     // Node to Node supervisorNodeId
-    this.Node.belongsTo(this.Node, { as: 'supervisor', foreignKey: 'supervisorNodeId' });
+    this.Node.belongsTo(this.Node, { as: 'owner', foreignKey: 'ownerNodeId' });
 
     // PackageRole to PackageRolePermission
     this.PackageRole.hasMany(this.PackageRolePermission, { as: 'permissions', foreignKey: 'packageRoleId' });
