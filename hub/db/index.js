@@ -39,7 +39,7 @@ class HubDatabase {
     this.Node.hasMany(this.NodeClosure, { as: 'ancestors', foreignKey: 'descendant' });
     this.NodeClosure.belongsTo(this.Node, { as: 'descendantNode', foreignKey: 'descendant' });
 
-    // Node to Node supervisorNodeId
+    // Node to Node ownerNodeId
     this.Node.belongsTo(this.Node, { as: 'owner', foreignKey: 'ownerNodeId' });
 
     // PackageRole to PackageRolePermission
