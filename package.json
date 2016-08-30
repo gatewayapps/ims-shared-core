@@ -1,6 +1,6 @@
 {
   "name": "ims-shared-core",
-  "version": "1.7.0",
+  "version": "1.7.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,7 @@
     "google-libphonenumber": "^1.0.22",
     "jsonwebtoken": "^7.1.9",
     "sequelize": "^3.24.0",
+    "socket.io-client": "^1.4.8",
     "tedious": "^1.14.0"
   }
 }

@@ -1,3 +1,4 @@
+"use strict";
 const io = require('socket.io-client');
 const jwt = require('jsonwebtoken');
 const Promise = require('bluebird');
@@ -10,19 +11,6 @@ class HubSocket {
 var socket, context, pendingRequests;
 pendingRequests = [];
 
-
-
-socket.on('connect', (ev) => {
-    console.log("Connected!");
-});
-socket.on('an event', (ev) => {
-    console.log(ev);
-});
-socket.on('event', (payload) => {
-    console.log(payload);
-});
-
-socket.emit('event', { your: 'mom' });
 
 module.exports = {
     use: function (config) {
@@ -76,7 +64,7 @@ module.exports = {
         //Wraps the emit function to sign the contents.
         //The server only retransmits signed payloads.
         //This should prevent spam in the socket.
-        payload = jwt.encode(payload, context.secret);
+        payload = jwt.sign(payload, context.secret);
         socket.emit(type, { contents: payload, package: context.packageId });
     },
     on: function (type, callback) {
