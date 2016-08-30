@@ -1,6 +1,6 @@
 {
   "name": "ims-shared-core",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/gatewayapps/ims-shared-core#readme",
   "dependencies": {
+    "bluebird": "^3.4.3",
     "google-libphonenumber": "^1.0.22",
+    "jsonwebtoken": "^7.1.9",
     "sequelize": "^3.24.0",
     "tedious": "^1.14.0"
   }
