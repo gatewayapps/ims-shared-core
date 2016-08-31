@@ -19,7 +19,7 @@ module.exports = {
 
         socket.on('connect', (ev) => {
             console.log('Connected to ' + context.hubUrl);
-            this.emit('register', { package: context.packageId });
+            this.emit('register', { package: context.packageId, contents: {} });
         });
 
         socket.on('response', (contents) => {
