@@ -87,7 +87,7 @@ function getTreeNodes(db, treeId) {
       {
         model: db.UserAccount,
         required: false,
-        attributes: [ 'userAccountId', 'firstName', 'lastName', 'displayName', 'displayName', 'email', 'jobTitle', 'homePhone', 'workPhone', 'cellPhone', 'profileImageUrl' ]
+        attributes: [ 'userAccountId', 'firstName', 'lastName', 'displayName', 'email', 'jobTitle', 'homePhone', 'workPhone', 'cellPhone', 'profileImageUrl' ]
       }
     ]
   };
@@ -170,9 +170,11 @@ function serializeUserAccount(node) {
   const ua = node.userAccount;
   if (ua) {
     Object.assign(serialized, {
+      userAccountId: ua.userAccountId,
       firstName: ua.firstName,
       lastName: ua.lastName,
       displayName: ua.displayName,
+      email: ua.email,
       jobTitle: ua.jobTitle,
       profileImageUrl: ua.profileImageUrl,
     });
