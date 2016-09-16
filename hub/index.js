@@ -19,6 +19,22 @@ class Hub {
     return false;
   }
 
+  getDescendantEquipment(nodes, options) {
+    if (!this._isInitialized()) {
+      throw new HubError('Hub has not been initialized.');
+    }
+
+    return treeService.getDescendantEquipment(this.db, nodes, options);
+  }
+
+  getDescendantUserAccounts(nodes, options) {
+    if (!this._isInitialized()) {
+      throw new HubError('Hub has not been initialized.');
+    }
+
+    return treeService.getDescendantUserAccounts(this.db, nodes, options);
+  }
+
   getStructuredTree(treeName) {
     if (!this._isInitialized()) {
       throw new HubError('Hub has not been initialized.');

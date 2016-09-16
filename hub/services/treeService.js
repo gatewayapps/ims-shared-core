@@ -15,8 +15,65 @@ const NODE_DETAIL_TYPES = {
 module.exports = {
   nodeDetailTypes: NODE_DETAIL_TYPES,
   trees: TREES,
+  getDescendantEquipment: getDescendantEquipment,
+  getDescendantUserAccounts: getDescendantUserAccounts,
   getParentsObject: getParentsObject,
   getStructuredTree: getStructuredTree,
+};
+
+function buildDescendantQuery(db, nodes, options) {
+  options = options || {};
+
+  const ancestorsWhere = {};
+
+  if (Array.isArray(nodes)) {
+    ancestorsWhere.ancestor = {
+      $in: nodes
+    }
+  }
+  else {
+    ancestorsWhere.ancestor = nodes;
+  }
+
+  const queryOptions = {
+    include: [
+      {
+        model: db.Node,
+        required: true,
+        attributes: [ ],
+        include: [
+          {
+            model: db.NodeClosure,
+            as: 'ancestors',
+            attributes: [ ],
+            where: ancestorsWhere,
+          }
+        ]
+      }
+    ]
+  };
+
+  if (Array.isArray(options.attributes) && options.attributes.length > 0) {
+    queryOptions.attributes = options.attributes;
+  }
+
+  if (Array.isArray(options.order) && options.order.length > 0) {
+    queryOptions.order = options.order;
+  }
+
+  return queryOptions;
+}
+
+function getDescendantEquipment(db, nodes, options) {
+  const queryOptions = buildDescendantQuery(db, nodes, options);
+
+  return db.Equipment.findAll(queryOptions);
+}
+
+function getDescendantUserAccounts(db, nodes, options) {
+  const queryOptions = buildDescendantQuery(db, nodes, options);
+
+  return db.UserAccount.findAll(queryOptions);
 }
 
 function getParentsObject(db) {
