@@ -1,6 +1,6 @@
 {
   "name": "ims-shared-core",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "",
   "babel": {
     "presets": [
@@ -10,7 +10,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "npm run build",
+    "prepublish": "npm run build",
     "build": "babel src --out-dir dist"
   },
   "repository": {
