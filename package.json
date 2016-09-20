@@ -29,7 +29,9 @@
     "jsonwebtoken": "^7.1.9",
     "sequelize": "^3.24.0",
     "socket.io-client": "^1.4.8",
-    "tedious": "^1.14.0",
+    "tedious": "^1.14.0"
+  },
+  "devDependencies": {
     "babel": "^6.5.2",
     "babel-cli": "^6.14.0",
     "babel-preset-es2015": "^6.14.0"
