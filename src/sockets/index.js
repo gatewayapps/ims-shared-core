@@ -2,6 +2,7 @@
 const io = require('socket.io-client');
 const jwt = require('jsonwebtoken');
 const Promise = require('bluebird');
+const uuidv4 = require('uuid/v4')
 
 class HubSocket {
     constructor(config) {
@@ -46,7 +47,7 @@ module.exports = {
     //THIS METHOD HAS NOT BEEN TESTED TO WORK CORRECTLY
     requestAsync: function (to, payload) {
         var req = {
-            id: pendingRequests.length + 1,
+            id: uuidv4(),
             to: to,
             package: context.packageId,
             contents: payload

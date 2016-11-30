@@ -1,6 +1,6 @@
 {
   "name": "ims-shared-core",
-  "version": "1.9.5",
+  "version": "1.10.0",
   "description": "",
   "babel": {
     "presets": [
