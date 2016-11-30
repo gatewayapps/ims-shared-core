@@ -24,7 +24,8 @@ module.exports = {
         }
     },
     Cookies: {
-        RefreshToken: "rt"
+        InitialState: "__INITIAL_STATE__",
+        RefreshToken: "rt",
     },
     TokenTypes: {
         Package: 'package',
