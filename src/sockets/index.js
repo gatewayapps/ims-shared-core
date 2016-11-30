@@ -1,51 +1,47 @@
 "use strict";
-const io = require('socket.io-client');
-const jwt = require('jsonwebtoken');
-const Promise = require('bluebird');
-const uuidv4 = require('uuid/v4')
 
-class HubSocket {
-    constructor(config) {
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-    }
-}
+var io = require('socket.io-client');
+var jwt = require('jsonwebtoken');
+var Promise = require('bluebird');
+var uuidv4 = require('uuid/v4');
+
+var HubSocket = function HubSocket(config) {
+    _classCallCheck(this, HubSocket);
+};
+
 var socket, context, pendingRequests;
-pendingRequests = [];
-
+pendingRequests = {};
 
 module.exports = {
-    use: function (config) {
+    use: function use(config) {
+        var _this = this;
+
         context = config;
         socket = io(context.hubUrl);
 
-        socket.on('connect', (ev) => {
+        socket.on('connect', function (ev) {
             console.log('Connected to ' + context.hubUrl);
-            this.emit('register', { package: context.packageId, contents: {} });
+            _this.emit('register', { package: context.packageId, contents: {} });
         });
 
-        socket.on('response', (contents) => {
-            for (var i = 0; i < pendingRequests.length; i++) {
-                if (pendingRequests[i].__id === contents.id) {
-                    pendingRequests[i].resolve(contents);
-                    pendingRequests.splice(i, 1);
-                    return;
-                }
+        socket.on('response', function (contents) {
+            if(pendingRequests[contents.id]){
+              pendingRequests[contents.id](contents)
+              delete pendingRequests[contents.id]
             }
         });
-        socket.on('error', (contents) => {
-            for (var i = 0; i < pendingRequests.length; i++) {
-                if (pendingRequests[i].__id === contents.id) {
-                    pendingRequests[i].reject(contents);
-                    pendingRequests.splice(i, 1);
-                    return;
-                }
+        socket.on('error', function (contents) {
+           if(pendingRequests[contents.id]){
+              pendingRequests[contents.id](contents)
+              delete pendingRequests[contents.id]
             }
         });
-
     },
 
     //THIS METHOD HAS NOT BEEN TESTED TO WORK CORRECTLY
-    requestAsync: function (to, payload) {
+    requestAsync: function requestAsync(to, payload, callback) {
         var req = {
             id: uuidv4(),
             to: to,
@@ -53,14 +49,12 @@ module.exports = {
             contents: payload
         };
 
-        var promise = new Promise();
-        promise.__id = req.id;
-        pendingRequests.push(promise);
+        
+        pendingRequests[req.id] = callback;
         this.emit("request", req);
-        return promise;
-
+        
     },
-    emit: function (type, payload) {
+    emit: function emit(type, payload) {
 
         //Wraps the emit function to sign the contents.
         //The server only retransmits signed payloads.
@@ -68,9 +62,7 @@ module.exports = {
         payload = jwt.sign(payload, context.secret);
         socket.emit(type, { contents: payload, package: context.packageId });
     },
-    on: function (type, callback) {
+    on: function on(type, callback) {
         socket.on(type, callback);
     }
 };
-
-
