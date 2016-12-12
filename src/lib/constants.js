@@ -24,8 +24,10 @@ module.exports = {
         }
     },
     Cookies: {
+        HubUrl: "HUB_URL",
         InitialState: "__INITIAL_STATE__",
-        RefreshToken: "rt",
+        PackageId: "PACKAGE_ID",
+        RefreshToken: "rt"
     },
     TokenTypes: {
         Package: 'package',
