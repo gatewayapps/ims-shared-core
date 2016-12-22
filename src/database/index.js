@@ -27,7 +27,8 @@ module.exports = (config, databaseNameOverride) => {
                 },
                 define: {
                     timestamps: false
-                }
+                },
+                logging: process.env.NODE_ENV === 'development' ? console.log : false
             });
     }
     return instances[dbName];
