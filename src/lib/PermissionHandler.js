@@ -13,7 +13,7 @@ function PermissionHandler(imsConfig) {
     }
     else {
       //this is an object, let's fill in any missing values
-      permission = _autoFillValues(permission);
+      permission = _autoFillValues(permission); 
     }
 
     try {
@@ -24,22 +24,33 @@ function PermissionHandler(imsConfig) {
       return false;
     }
 
-    if (!Array.isArray(userPermissions) || userPermissions.length === 0)
+    if (!Array.isArray(userPermissions) || userPermissions.length === 0){
+      console.log('userPermissions is not an array')
       return false;
+    }
 
     //Always check if a specific permission has been denied first
-    if (_isPermissionDenied(permission, userPermissions))
+    if (_isPermissionDenied(permission, userPermissions)){
+      console.log('permission is denied')
       return false;
+    }
 
 
     //Has it been explicitly granted to the user
     if (_isPermissionGranted(permission, userPermissions, skipTreeNodeCheck))
       return true;
+    else {
+      console.log('permission is not granted')
+    }
 
 
     //Did the user inherit it based on their role
     if (_isPermissionInherited(permission, userPermissions, skipTreeNodeCheck))
+    {
       return true;
+    } else {
+      console.log('permission is not inherited')
+    }
 
     return false;
   }
@@ -189,17 +200,17 @@ function PermissionHandler(imsConfig) {
           // Is the role value for this permission greater than the role value for the permission we are checking
           // and is the action '*' for the user permission
           if (pRoleValue > roleCheckValue && p.action === '*') {
-
+            console.log('role value is greater')
             // This user has a higher level role with full permissions in some area
 
             // Does this permission apply to everything or only a specific tree?
             // If it's a specific tree, does it match the one we are checking against
             if (p.tree === '*' || p.tree === permission.tree || skipTreeNodeCheck === true) {
-
+              console.log('skipTreeNodeCheck 1')
               // Does this permission apply to everything or only a specific node?
               // If it's a specfic node, does it apply to a parent of the one we are checking against
               if (p.node === '*' || TreeHelper.isNodeDescendantOf(p.node, permission.node) || skipTreeNodeCheck) {
-
+                console.log('skipTreeNodeCheck 2')
                 return true;
               }
               
