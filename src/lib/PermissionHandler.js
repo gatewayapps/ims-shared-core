@@ -8,9 +8,6 @@ function PermissionHandler(imsConfig) {
 
   this.checkPermission = function (permission, userPermissions, skipTreeNodeCheck) {
     skipTreeNodeCheck = skipTreeNodeCheck || false;
-
-    skipTreeNodeCheck = skipTreeNodeCheck || false;
-
     if (typeof permission === 'string') {
       permission = this.createPermissionFromString(permission);
     }
@@ -41,7 +38,7 @@ function PermissionHandler(imsConfig) {
 
 
     //Did the user inherit it based on their role
-    if (_isPermissionInherited(permission, userPermissions))
+    if (_isPermissionInherited(permission, userPermissions, skipTreeNodeCheck))
       return true;
 
     return false;
