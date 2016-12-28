@@ -40,10 +40,19 @@ module.exports = (Sequelize, dbContext) => {
     profileImageUrl: {
       type: Sequelize.STRING(500)
     },
+    hireDate: {
+      type: Sequelize.DATE
+    },
+    positionStartDate: {
+      type: Sequelize.DATE
+    },
+    nodePath: {
+      type: Sequelize.STRING(500)
+    },
     isTerminated: {
       type: Sequelize.BOOLEAN,
       allowNull: false,
-      defaultValue: false,
+      defaultValue: false
     },
     isDeleted: {
       type: Sequelize.BOOLEAN,
@@ -52,16 +61,16 @@ module.exports = (Sequelize, dbContext) => {
     },
     createdBy: {
       type: Sequelize.INTEGER,
-      "x-prevent-update": false,
+      "x-prevent-update": false
     },
     createdDate: {
       type: Sequelize.DATE,
       allowNull: false,
       defaultValue: Sequelize.NOW,
-      "x-prevent-update": false,
+      "x-prevent-update": false
     },
     modifiedBy: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.INTEGER
     },
     modifiedDate: {
       type: Sequelize.DATE,
@@ -72,7 +81,7 @@ module.exports = (Sequelize, dbContext) => {
     tableName: 'UserAccounts',
     defaultScope: {
       where: {
-        isDeleted: false,
+        isDeleted: false
       }
     },
     scopes: {
