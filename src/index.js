@@ -6,6 +6,7 @@ const PermissionHandler = require('./lib/PermissionHandler');
 const TreeHelper = require('./lib/TreeHelper');
 
 import {createLogger} from './lib/Logger'
+import Logger from './lib/Logger'
 
 
 module.exports = {
