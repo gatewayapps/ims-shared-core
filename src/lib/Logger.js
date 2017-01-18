@@ -5,8 +5,7 @@ const fs = require('fs')
 const bunyanDebugStream = require('bunyan-debug-stream')
 var loggerInstance // singleton
 
-
-export default {
+var loggerWrapper = {
   debug: ()=>{
     loggerInstance.debug(...arguments)
   },
@@ -17,6 +16,9 @@ export default {
     loggerInstance.error(...arguments)
   }
 }
+
+export default loggerWrapper
+
 export function createLogger(config) {
   const logPath = path.join(config.fileStoragePath, 'logs')
 
