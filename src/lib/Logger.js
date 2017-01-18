@@ -6,14 +6,14 @@ const bunyanDebugStream = require('bunyan-debug-stream')
 var loggerInstance // singleton
 
 var loggerWrapper = {
-  debug: ()=>{
-    loggerInstance.debug(...arguments)
+  debug: (...args)=>{
+    loggerInstance.debug(...args)
   },
-  info: () =>{
-    loggerInstance.info(...arguments)
+  info: (...args) =>{
+    loggerInstance.info(...args)
   },
-  error: ()=>{
-    loggerInstance.error(...arguments)
+  error: (...args)=>{
+    loggerInstance.error(...args)
   }
 }
 
