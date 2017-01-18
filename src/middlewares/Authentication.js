@@ -39,7 +39,7 @@ function defaultHandler(req, res, next) {
       return null
     }
 
-    return this.validate(token, next)
+    return this.validate(req, token, next)
   } else {
     next(new UnauthorizedError('Access Token not provided'))
     return null
@@ -72,11 +72,11 @@ function swaggerHandler(req, authOrSecDef, scopesOrApiKey, next) {
     return null
   }
 
-  return validate(token, next)
+  return validate(req, token, next)
 
 }
 
-function validate(token, next) {
+function validate(req, token, next) {
   return jwt.verifyAsync(token, config.secret)
     .then(decodedToken => {
       req.context = decodedToken
