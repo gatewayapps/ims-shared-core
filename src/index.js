@@ -5,8 +5,8 @@ const phoneNumberUtils = require('./lib/phoneNumberUtils');
 const PermissionHandler = require('./lib/PermissionHandler');
 const TreeHelper = require('./lib/TreeHelper');
 
-import {createLogger} from './lib/Logger'
-import Logger from './lib/Logger'
+import {createLogger, default as Logger} from './lib/Logger'
+
 
 module.exports = {
     Constants: constants,

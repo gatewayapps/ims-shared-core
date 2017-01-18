@@ -6,7 +6,7 @@ const bunyanDebugStream = require('bunyan-debug-stream')
 var loggerInstance // singleton
 
 
-export default Logger = {
+export default {
   debug: ()=>{
     loggerInstance.debug(...arguments)
   },
