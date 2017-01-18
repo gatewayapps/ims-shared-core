@@ -14,6 +14,12 @@ var loggerWrapper = {
   },
   error: (...args)=>{
     loggerInstance.error(...args)
+  },
+  api: (...args) =>{
+    loggerInstance.api(...args)
+  },
+  url: (...args) =>{
+    loggerInstance.url(...args)
   }
 }
 
