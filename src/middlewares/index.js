@@ -1,3 +1,4 @@
 module.exports = {
-  Authentication: require('./Authentication')
+  Authentication: require('./Authentication'),
+  FileUpload: require('./FileUpload')
 }
