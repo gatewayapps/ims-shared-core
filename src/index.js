@@ -8,7 +8,6 @@ const TreeHelper = require('./lib/TreeHelper');
 import {createLogger} from './lib/Logger'
 import Logger from './lib/Logger'
 
-
 module.exports = {
     Constants: constants,
     PermissionHandler: PermissionHandler,

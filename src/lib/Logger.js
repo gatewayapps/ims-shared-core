@@ -3,10 +3,20 @@ const bunyan = require('bunyan')
 const path = require('path')
 const fs = require('fs')
 const bunyanDebugStream = require('bunyan-debug-stream')
-var Logger // singleton
+var loggerInstance // singleton
 
 
-export default Logger
+export default Logger = {
+  debug: ()=>{
+    loggerInstance.debug(...arguments)
+  },
+  info: () =>{
+    loggerInstance.info(...arguments)
+  },
+  error: ()=>{
+    loggerInstance.error(...arguments)
+  }
+}
 export function createLogger(config) {
   const logPath = path.join(config.fileStoragePath, 'logs')
 
@@ -39,16 +49,16 @@ export function createLogger(config) {
     count: 7,
     path: path.join(logPath, `${config.packageId}.log`)
   }]
-  Logger = bunyan.createLogger({
+  loggerInstance = bunyan.createLogger({
     name: `${config.packageId}`,
     serializers: bunyan.stdSerializers,
     streams: process.env.NODE_ENV === 'development' ? DEBUG_STREAMS : PROD_STREAMS
   })
-  Logger.api = (message) => {
-    Logger.info(`[API CALL] - ${message}`)
+  loggerInstance.api = (message) => {
+    loggerInstance.info(`[API CALL] - ${message}`)
   }
 
-  Logger.url = (message) => {
-    Logger.info(`[URL] - ${message}`)
+  loggerInstance.url = (message) => {
+    loggerInstance.info(`[URL] - ${message}`)
   }
 }

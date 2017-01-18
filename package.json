@@ -1,6 +1,6 @@
 {
   "name": "ims-shared-core",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "",
   "babel": {
     "presets": [
@@ -25,6 +25,8 @@
   "homepage": "https://github.com/gatewayapps/ims-shared-core#readme",
   "dependencies": {
     "bluebird": "^3.4.3",
+    "bunyan": "^1.8.5",
+    "bunyan-debug-stream": "^1.0.7",
     "google-libphonenumber": "^1.0.22",
     "jsonwebtoken": "^7.1.9",
     "sequelize": "^3.24.0",
