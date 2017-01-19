@@ -4,8 +4,15 @@ var instances = {};
 
 module.exports = (config, databaseNameOverride) => {
     var dbName = databaseNameOverride || config.databaseName;
-    console.log(`Trying to login to ${dbName}`);
     if (!instances[dbName]) {
+        var logging = (
+          config.logging ? config.logging : (
+            process.env.NODE_ENV === 'development' ? console.log : false
+          )
+        )
+        if(logging){
+          console.log(`Connecting to ${dbName}`)
+        }
         instances[dbName] = new Sequelize(dbName,
             config.username,
             config.password, {
@@ -28,8 +35,15 @@ module.exports = (config, databaseNameOverride) => {
                 define: {
                     timestamps: false
                 },
-                logging: process.env.NODE_ENV === 'development' ? console.log : false
+                logging: logging
             });
+        instances[dbName].authenticate().complete(function(err){
+          if(err){
+            console.error(err)
+          } else {
+            console.log(`Connected to ${dbName}`)
+          }
+        })
     }
     return instances[dbName];
 }
