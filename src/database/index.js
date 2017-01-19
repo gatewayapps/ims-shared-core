@@ -5,11 +5,9 @@ var instances = {};
 module.exports = (config, databaseNameOverride) => {
   var dbName = databaseNameOverride || config.databaseName;
   if (!instances[dbName]) {
-    var logging = (
-      config.logging ? config.logging : (
-        process.env.NODE_ENV === 'development' ? console.log : false
-      )
-    )
+    var logging = process.env.NODE_ENV === 'development' ? console.log : false
+      
+    
     if (logging) {
       console.log(`Connecting to ${dbName}`)
     }
