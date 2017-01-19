@@ -1,4 +1,5 @@
 'use strict'
+const url = require('url');
 const bunyan = require('bunyan')
 const path = require('path')
 const fs = require('fs')
@@ -62,11 +63,24 @@ export function createLogger(config) {
     serializers: bunyan.stdSerializers,
     streams: process.env.NODE_ENV === 'development' ? DEBUG_STREAMS : PROD_STREAMS
   })
-  loggerInstance.api = (message) => {
-    loggerInstance.info(`[API CALL] - ${message}`)
+  loggerInstance.api = (req) => {
+    var user = "GUEST/0"
+    if(req.context)
+    {
+      user = `${req.context.displayName}/${req.context.userAccountId}`
+    }
+    loggerInstance.info(`[API CALL]: (${user}) - ${fullUrl(req)}`)
   }
 
   loggerInstance.url = (message) => {
     loggerInstance.info(`[URL] - ${message}`)
   }
+}
+
+function fullUrl(req) {
+  return url.format({
+    protocol: req.protocol,
+    hostname: req.hostname,
+    pathname: req.originalUrl
+  });
 }
