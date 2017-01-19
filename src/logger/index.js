@@ -7,19 +7,19 @@ const bunyanDebugStream = require('bunyan-debug-stream')
 var loggerInstance // singleton
 
 var loggerWrapper = {
-  debug: (...args)=>{
+  debug: (...args) => {
     loggerInstance.debug(...args)
   },
-  info: (...args) =>{
+  info: (...args) => {
     loggerInstance.info(...args)
   },
-  error: (...args)=>{
+  error: (...args) => {
     loggerInstance.error(...args)
   },
-  api: (...args) =>{
+  api: (...args) => {
     loggerInstance.api(...args)
   },
-  url: (...args) =>{
+  url: (...args) => {
     loggerInstance.url(...args)
   }
 }
@@ -65,11 +65,16 @@ export function createLogger(config) {
   })
   loggerInstance.api = (req) => {
     var user = "GUEST/0"
-    if(req.context)
-    {
+    if (req.context) {
       user = `${req.context.displayName}/${req.context.userAccountId}`
     }
-    loggerInstance.info(`[API CALL]: (${user}) - ${fullUrl(req)}`)
+    if (req.body) {
+      loggerInstance.info(`[API CALL]: (${user}) - ${fullUrl(req)}`, req.body)
+    } else {
+
+    }
+
+
   }
 
   loggerInstance.url = (message) => {
@@ -80,7 +85,7 @@ export function createLogger(config) {
 function fullUrl(req) {
   return url.format({
     protocol: req.protocol,
-    hostname: req.hostname,
+    hostname: req.get('Host'),
     pathname: req.originalUrl
   });
 }
