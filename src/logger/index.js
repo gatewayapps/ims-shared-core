@@ -68,11 +68,10 @@ export function createLogger(config) {
     if (req.context) {
       user = `${req.context.displayName}/${req.context.userAccountId}`
     }
+    loggerInstance.info(`[API CALL]: (${user}) - ${req.method} ${fullUrl(req)}`)
     if (req.body) {
-      loggerInstance.info(`[API CALL]: (${user}) - ${fullUrl(req)}`, req.body)
-    } else {
-
-    }
+      loggerInstance.info(`[REQUEST BODY]: ${req.body}`)
+    } 
 
 
   }
@@ -85,7 +84,7 @@ export function createLogger(config) {
 function fullUrl(req) {
   return url.format({
     protocol: req.protocol,
-    hostname: req.get('Host'),
+    hostname: req.get('Host').toString().replace('[', '').replace(']', ''),
     pathname: req.originalUrl
   });
 }
