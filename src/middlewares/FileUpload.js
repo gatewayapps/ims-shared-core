@@ -3,7 +3,7 @@ const uuidv4 = require('uuid/v4')
 const fs = require('fs')
 const mime = require('mime')
 const AuthenticationMiddleware = require('./Authentication')
-const move = require('../utils')
+const move = require('../utils/move')
 /* options shape
   {
     uploadCallback:  Method to call after an upload is complete,
