@@ -70,7 +70,7 @@ export function createLogger(config) {
     }
     loggerInstance.info(`[API CALL]: (${user}) - ${req.method} ${fullUrl(req)}`)
     if (req.body) {
-      loggerInstance.info(`[REQUEST BODY]: ${JSON.stringify(req.body, null, '\t')}`)
+      loggerInstance.info(`[REQUEST BODY]`, req.body)
     } 
 
 
