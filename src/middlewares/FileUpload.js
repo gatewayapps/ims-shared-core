@@ -1,6 +1,7 @@
 'use strict'
 const uuidv4 = require('uuid/v4')
 const bb = require('express-busboy')
+const mkdirp = require('mkdirp')
 const path = require('path')
 const fs = require('fs')
 const mime = require('mime')
@@ -20,6 +21,13 @@ const ERROR_FILE_WRITE = 'There was an error writing the file to disk'
 
 module.exports = (app, config, options) => {
   var auth = AuthenticationMiddleware(config)
+  mkdirp(path.join(config.fileStoragePath, 'uploads'), (err) => {
+    if (err) {
+      console.error(err)
+    } else {
+
+    }
+  })
   bb.extend(app, {
     upload: true
   })
