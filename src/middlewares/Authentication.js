@@ -38,7 +38,7 @@ function defaultHandler(req, res, next) {
       return null
     }
 
-    return this.validate(req, token, next)
+    return validate(req, token, next)
   } else {
     next(new UnauthorizedError('Access Token not provided'))
     return null
