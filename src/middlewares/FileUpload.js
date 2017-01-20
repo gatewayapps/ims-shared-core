@@ -1,6 +1,7 @@
 'use strict'
 const uuidv4 = require('uuid/v4')
 const bb = require('express-busboy')
+const path = require('path')
 const fs = require('fs')
 const mime = require('mime')
 const AuthenticationMiddleware = require('./Authentication')
