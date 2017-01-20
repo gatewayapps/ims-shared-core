@@ -61,14 +61,14 @@ module.exports = (app, config, options) => {
             res.json({ success: false, message: ERROR_FILE_WRITE })
           }
         } else {
-          return fs.stat(finalPath).then((stats) => {
-            options.uploadCallback(req, res, {
-              path: finalPath,
-              id: id,
-              mimeType: mimeType,
-              size: stats['size']
-            })
+          const stats = fs.statSync(finalPath)
+          options.uploadCallback(req, res, {
+            path: finalPath,
+            id: id,
+            mimeType: mimeType,
+            size: stats['size']
           })
+
           //The move didn't fail, so we are done here.  
 
         }
