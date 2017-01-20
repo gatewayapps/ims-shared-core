@@ -24,7 +24,7 @@ module.exports = (app, config, options) => {
   })
   app.post('/api/upload', auth.defaultMiddleware, (req, res) => {
     //if there's no file, this should error out
-    if (!req.files || res.files.length < 1) {
+    if (!req.files || req.files.length < 1) {
       if (options.errorCallback) {
         options.errorCallback(ERROR_NO_FILE_PRESENT)
       } else {
