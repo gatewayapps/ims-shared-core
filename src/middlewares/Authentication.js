@@ -24,7 +24,6 @@ module.exports = (conf) => {
 
 function defaultHandler(req, res, next) {
   const tokenHeader = req.headers['x-ims-authorization']
-
   if (tokenHeader) {
     const authParts = tokenHeader.split(' ')
     if (authParts.length < 2) {
@@ -32,7 +31,7 @@ function defaultHandler(req, res, next) {
       return null
     }
 
-    token = authParts[1]
+    var token = authParts[1]
 
     if (!token) {
       next(new UnauthorizedError('Access Token is not valid'))
