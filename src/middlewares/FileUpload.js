@@ -50,7 +50,7 @@ module.exports = (app, config, options) => {
       //The final location of the uploaded file.  This gets passed to callback
       var finalPath = generateLocalPath(config, id, fileName)
       //Get the mime type
-      var mimeType = mime(tempPath)
+      var mimeType = mime.lookup(tempPath)
 
       //Move the file to it's new location
       move(tempPath, finalPath).then((err) => {
