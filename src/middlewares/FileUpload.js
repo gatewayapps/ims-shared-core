@@ -1,5 +1,6 @@
 'use strict'
 const uuidv4 = require('uuid/v4')
+const bb = require('express-busboy')
 const fs = require('fs')
 const mime = require('mime')
 const AuthenticationMiddleware = require('./Authentication')
@@ -18,7 +19,9 @@ const ERROR_FILE_WRITE = 'There was an error writing the file to disk'
 
 module.exports = (app, config, options) => {
   var auth = AuthenticationMiddleware(config)
-
+  bb.extend(app, {
+    upload: true
+  })
   app.post('/api/upload', auth.defaultMiddleware, (req, res) => {
     //if there's no file, this should error out
     if (!req.files || res.files.length < 1) {
