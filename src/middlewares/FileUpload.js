@@ -64,8 +64,10 @@ module.exports = (app, config, options) => {
           const stats = fs.statSync(finalPath)
           options.uploadCallback(req, res, {
             path: finalPath,
+            fileName: fileName,
             id: id,
             mimeType: mimeType,
+            uploadedBy: req.context.userAccountId,
             size: stats['size']
           })
 
