@@ -89,5 +89,5 @@ module.exports = (app, config, options) => {
 
 
 function generateLocalPath(config, id, fileName) {
-  return path.join(config.fileStoragePath, 'uploads', `${id}-${fileName}`)
+  return path.resolve(path.join(config.fileStoragePath, 'uploads', `${id}-${fileName}`))
 }
