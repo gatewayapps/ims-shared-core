@@ -1,4 +1,5 @@
 'use strict'
+const uuid = require('uuid')
 const uuidv4 = require('uuid/v4')
 const bb = require('express-busboy')
 const mkdirp = require('mkdirp')
