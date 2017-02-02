@@ -186,6 +186,7 @@ function serializeBranch(node, children) {
     dataType: 'node',
     nodeId: node.nodeId,
     name: node.name,
+    nodeDetailTypeId: node.nodeDetailTypeId,
     nodeTypeId: node.nodeType.nodeTypeId,
     nodeTypeName: node.nodeType.name,
     children: children,
@@ -197,6 +198,7 @@ function serializeEquipment(node) {
     dataType: 'equipment',
     nodeId: node.nodeId,
     name: node.name,
+    nodeDetailTypeId: node.nodeDetailTypeId
   };
 
   const eq = node.equipment;
@@ -222,6 +224,7 @@ function serializeUserAccount(node) {
     dataType: 'userAccount',
     nodeId: node.nodeId,
     name: node.name,
+    nodeDetailTypeId: node.nodeDetailTypeId
   };
 
   const ua = node.userAccount;
