@@ -4,7 +4,7 @@ module.exports = (Sequelize, dbContext) => {
       type: Sequelize.UUID,
       allowNull: false,
       primaryKey: true,
-      defaultValue: DataTypes.UUIDV4
+      defaultValue: Sequelize.UUIDV4
     },
     stateId: {
       type: Sequelize.INTEGER,

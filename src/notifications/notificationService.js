@@ -1,4 +1,4 @@
-import Promise from 'bludbird';
+import Promise from 'bluebird';
 import HubDatabase from '../hub/db';
 import logger from '../logger';
 
@@ -29,7 +29,7 @@ export function queueNotification (to, type, body, callback) {
       sendDate: sendDate,
       message: JSON.stringify(notification)
     }).then((queueItem) => {
-      logger.debug(queueItem);
+      logger.debug(queueItem.toJSON());
       callback(null, queueItem.notificationId);
       return queueItem.notificationId;
     }).catch((error) => {
