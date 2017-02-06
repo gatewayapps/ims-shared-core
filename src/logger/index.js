@@ -58,7 +58,7 @@ export function createLogger(config, subFileName) {
     type: 'rotating-file',
     period: '1d',
     count: 7,
-    path: path.join(logPath, `${config.packageId}.log`)
+    path: path.join(logPath, logFileName)
   }]
   loggerInstance = bunyan.createLogger({
     name: `${config.packageId}`,
