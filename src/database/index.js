@@ -3,6 +3,12 @@ const Sequelize = require('sequelize');
 var instances = {};
 
 module.exports = (config, databaseNameOverride) => {
+  // Support for automatic transactions
+  if(config.cls){
+    Sequelize.cls = config.cls
+  }
+
+
   var dbName = databaseNameOverride || config.databaseName;
   if (!instances[dbName]) {
     var logging = process.env.NODE_ENV === 'development' ? console.log : false
