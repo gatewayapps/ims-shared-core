@@ -49,8 +49,9 @@ module.exports = {
             contents: payload
         };
 
-        
-        pendingRequests[req.id] = callback;
+        if (callback) {
+            pendingRequests[req.id] = callback;
+        }
         this.emit("request", req);
         
     },

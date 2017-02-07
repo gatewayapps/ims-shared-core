@@ -26,7 +26,7 @@ var loggerWrapper = {
 
 export default loggerWrapper
 
-export function createLogger(config) {
+export function createLogger(config, subFileName) {
   const logPath = path.join(config.fileStoragePath, 'logs')
 
   try {
@@ -48,6 +48,8 @@ export function createLogger(config) {
     })
   }]
 
+  const logFileName = subFileName ? `${config.packageId}_${subFileName}.log` : `${config.packageId}.log`
+
   const PROD_STREAMS = [{
     level: 'debug',
     stream: process.stdout
@@ -56,7 +58,7 @@ export function createLogger(config) {
     type: 'rotating-file',
     period: '1d',
     count: 7,
-    path: path.join(logPath, `${config.packageId}.log`)
+    path: path.join(logPath, logFileName)
   }]
   loggerInstance = bunyan.createLogger({
     name: `${config.packageId}`,
