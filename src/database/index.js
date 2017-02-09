@@ -12,7 +12,9 @@ module.exports = (config, databaseNameOverride) => {
   var dbName = databaseNameOverride || config.databaseName;
   if (!instances[dbName]) {
     var logging = process.env.NODE_ENV === 'development' ? console.log : false
-      
+    if(config.logging === false){
+      logging = false
+    }
     
     if (logging) {
       console.log(`Connecting to ${dbName}`)
@@ -42,7 +44,9 @@ module.exports = (config, databaseNameOverride) => {
         logging: logging
       });
     instances[dbName].authenticate().then(() => {
+      if(logging){
         console.log(`${dbName} connected`)
+      }
       }).catch((err)=>{
         console.error(err)
       })
