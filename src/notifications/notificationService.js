@@ -79,7 +79,7 @@ export function queueNotificationForNodes (nodes, type, body, callback) {
     },
     type: Sequelize.QueryTypes.SELECT
   }).then((userAccounts) => {
-    const to = usersAccounts.map((u) => u.userAccountId);
+    const to = userAccounts.map((u) => u.userAccountId);
     return queueNotification(to, type, body, cb);
   }).catch((error) => {
     cb(error);

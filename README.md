@@ -1,7 +1,7 @@
 # ims-shared-core
 Core library for IMS projects
 
-## Queuing Notifications
+## Notifications
 
 ### Setup
 In the main startup, create the notification service using the config for your app. This should be done after createing the logger instance.
@@ -23,8 +23,9 @@ import { createNotificationService } from 'ims-shared-core/notifications'
 createLogger(imsConfig)
 createNotificationService(imsConfig, { log: logger.debug })
 ```
+### Sending Notifications
 
-### Queue Notifications for User Accounts
+#### Queue Notifications for User Accounts
 Import the queueNotification method from ims-shared-core/notifications.
 
 queueNotification(to, type, body[, callback]) => Promise(notificationId)
@@ -50,7 +51,7 @@ queueNotification(userAccountIds, type, body)
   })
 ```
 
-### Queue Notifications for Nodes
+#### Queue Notifications for Nodes
 Import the queueNotificationForNodes method from ims-shared-core/notifications.
 
 queueNotificationForNodes(nodes, type, body[, callback]) => Promise(notificationId)
@@ -92,3 +93,22 @@ deleteNotification(notificationId)
     console.log(success)
   })
 ```
+
+### Notification Status Updates
+When a notification is sent or fails to send, a request is sent to the package that scheduled the notification over web sockets. The package can listen for these and handle the change of status as needed.
+
+#### Notification Sent
+Sent after a notification has successfully been sent.
+
+* payload
+  * type: 'NOTIFICATION_SENT'
+  * notificationId
+  * rejectedUsers - [userAccountIds]
+    * These users did not receive the notificaiton usually due to missing or bad email addresses
+
+#### Notification Failed
+The service attempts to send a notification four times. On the fourth failed attempt, the notifcation is consided "poisoned" and no further attempts to deliver the notification will be made.
+
+* payload
+  * type: 'NOTIFICATION_FAILED'
+  * notificationId
