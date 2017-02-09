@@ -1,19 +1,30 @@
 import Promise from 'bluebird';
 import Sequelize from 'sequelize';
 import HubDatabase from '../hub/db';
-import logger from '../logger';
 
 let db;
+let defaultBody = {};
+let logger = function () {};
 
-export function createNotificationService (config) {
-  logger.debug('Creating HubDatabase for NotificationService');
+export function createNotificationService (config, options) {
+  options = options || {}
+
+  if (typeof options.log === 'function') {
+    logger = options.log;
+  }
+
+  defaultBody = {
+    packageId: config.packageId
+  };
+
+  logger('Creating HubDatabase for NotificationService');
   db = new HubDatabase(config.database);
 }
 
 export function deleteNotification (notificationId, callback) {
-  callback = wrapCallback(callback)
+  callback = wrapCallback(callback);
 
-  const deleteCmd = 'EXECUTE [dbo].[usp_DeleteQueuedNotification] @i_notificationId = :notificationId'
+  const deleteCmd = 'EXECUTE [dbo].[usp_DeleteQueuedNotification] @i_notificationId = :notificationId';
   return db.context.query(deleteCmd, {
     replacements: {
       notificationId: notificationId
@@ -29,11 +40,11 @@ export function deleteNotification (notificationId, callback) {
     }
 
     // If it gets here then results is empty or 0 was affected
-    const error = new Error('Notification does not exist or has already been sent.')
+    const error = new Error('Notification does not exist or has already been sent.');
     error.notificationId = notificationId;
     throw error;
   }).catch((error) => {
-    logger.debug({ err: error })
+    logger(`Error: ${JSON.stringify(error)}`);
     callback(error);
     throw error;
   });
@@ -47,7 +58,7 @@ export function queueNotificationForNodes (nodes, type, body, callback) {
   const cb = function (err, notificationId) {
     if (callbackCount === 0) {
       const local = wrapCallback(callback);
-      local(err, notificationId)
+      local(err, notificationId);
       callbackCount++;
     }
   };
@@ -77,9 +88,11 @@ export function queueNotificationForNodes (nodes, type, body, callback) {
 }
 
 export function queueNotification (to, type, body, callback) {
-  callback = wrapCallback(callback)
+  callback = wrapCallback(callback);
 
   try {
+    body = Object.assign({}, defaultBody, body);
+
     validateNotification(to, type, body);
 
     const notification = Object.assign({}, body, {
@@ -89,18 +102,18 @@ export function queueNotification (to, type, body, callback) {
 
     const sendDate = body.sendAt || Date.now();
 
-    logger.debug('Creating item in Notification Queue');
+    logger('Creating item in Notification Queue');
 
     return db.NotificationQueue.create({
       stateId: 1, // Queued
       sendDate: sendDate,
       message: JSON.stringify(notification)
     }).then((queueItem) => {
-      logger.debug(queueItem.toJSON());
+      logger(queueItem.toJSON());
       callback(null, queueItem.notificationId);
       return queueItem.notificationId;
     }).catch((error) => {
-      logger.error({ err: error });
+      logger(`Error: ${JSON.stringify(error)}`);
       callback(error);
       throw error;
     });
@@ -111,7 +124,7 @@ export function queueNotification (to, type, body, callback) {
 }
 
 function validateNotification (to, type, body) {
-  logger.debug('Validating notification: ', { to: to, type: type, body: body });
+  logger('Validating notification: ', JSON.stringify({ to: to, type: type, body: body }));
   if (!Array.isArray(to) || to.length === 0) {
     throw new TypeError('to should be an array with at list one value');
   }

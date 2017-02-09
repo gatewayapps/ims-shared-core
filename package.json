@@ -1,6 +1,6 @@
 {
   "name": "ims-shared-core",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "",
   "babel": {
     "presets": [
@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/gatewayapps/ims-shared-core.git"
   },
-  "author": "Daniel Gary <daniel@gatewayapps.com> (http://www.gatewayapps.com)",
+  "author": "Daniel Gary <daniel@gatewayapps.com> (http://www.gatewayapps.com), Justin Neff <justin@gatewayapps.com> (http://www.gatewayapps.com)",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/gatewayapps/ims-shared-core/issues"

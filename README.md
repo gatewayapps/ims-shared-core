@@ -1,17 +1,27 @@
 # ims-shared-core
+Core library for IMS projects
 
 ## Queuing Notifications
 
 ### Setup
 In the main startup, create the notification service using the config for your app. This should be done after createing the logger instance.
 
+createNotificationService(config[, options])
+
+* **config** - IMS configuration object
+* options
+  * log - function to be used print log messages inside the notificationService
+
 ```js
 import imsConfig from './config'
-import { createLogger } from 'ims-shared-core/logger'
+import {
+  createLogger,
+  default as logger
+} from 'ims-shared-core/logger'
 import { createNotificationService } from 'ims-shared-core/notifications'
 
 createLogger(imsConfig)
-createNotificationService(imsConfig)
+createNotificationService(imsConfig, { log: logger.debug })
 ```
 
 ### Queue Notifications for User Accounts
@@ -22,7 +32,6 @@ queueNotification(to, type, body[, callback]) => Promise(notificationId)
 * **to** - array of userAccountIds
 * **type** - notification type (in future will be used for determining notification preferences)
 * **body**
-  * **packageId**
   * **subject**
   * **longContent** - email body
   * sendAt - date of when to send the notification useful for scheduling future notifications
@@ -49,7 +58,6 @@ queueNotificationForNodes(nodes, type, body[, callback]) => Promise(notification
 * **nodes** - array of nodeIds. The process will lookup the UserAccounts under the nodes.
 * **type** - notification type (in future will be used for determining notification preferences)
 * **body**
-  * **packageId**
   * **subject**
   * **longContent** - email body
   * sendAt - date of when to send the notification useful for scheduling future notifications
