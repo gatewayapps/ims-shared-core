@@ -60,14 +60,8 @@ export function deleteNotifications(notificationIds, callback){
     },
     force: true
   }).then((affected)=>{
-    if(affected === notificationIds.length){
-      callback(null, true)
-      return true
-    }
-
-    const error = new Error(`Tried to delete ${notificationIds} notifications, but only deleted ${affected}.`)
-    error.notificationIds = notificationIds
-    throw error
+    callback(null, true)
+    return true
   }).catch((error)=>{
     logger(`Error: ${JSON.stringify(error)}`);
     callback(error);
