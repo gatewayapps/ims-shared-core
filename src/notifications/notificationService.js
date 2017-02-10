@@ -50,6 +50,31 @@ export function deleteNotification (notificationId, callback) {
   });
 }
 
+export function deleteNotifications(notificationIds, callback){
+  callback = wrapCallback(callback)
+  return db.notificationQueue.destroy({
+    where: {
+      notificationId: {
+        $in: notificationIds
+      }
+    },
+    force: true
+  }).then((affected)=>{
+    if(affected === notificationIds.length){
+      callback(null, true)
+      return true
+    }
+
+    const error = new Error(`Tried to delete ${notificationIds} notifications, but only deleted ${affected}.`)
+    error.notificationIds = notificationIds
+    throw error
+  }).catch((error)=>{
+    logger(`Error: ${JSON.stringify(error)}`);
+    callback(error);
+    throw error;
+  })
+}
+
 export function queueNotificationForNodes (nodes, type, body, callback) {
   // This local cb function is here to prevent a case where if the callback
   // could get called twice should the error happen inside the queueNotification
