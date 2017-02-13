@@ -52,7 +52,7 @@ export function deleteNotification (notificationId, callback) {
 
 export function deleteNotifications(notificationIds, callback){
   callback = wrapCallback(callback)
-  return db.notificationQueue.destroy({
+  return db.NotificationQueue.destroy({
     where: {
       notificationId: {
         $in: notificationIds
