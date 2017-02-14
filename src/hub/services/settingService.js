@@ -14,7 +14,7 @@ export function createSettingService (config) {
 export function getSetting (key) {
   throwIfNotInitialized()
 
-  return hubDb.Settings.findOne({
+  return hubDb.Setting.findOne({
     where: {
       key: key
     }
@@ -26,7 +26,7 @@ export function getSetting (key) {
 export function getSettings (keys) {
   throwIfNotInitialized();
 
-  return hubDb.Settings.findAll({
+  return hubDb.Setting.findAll({
     where: {
       key: {
         $in: keys
