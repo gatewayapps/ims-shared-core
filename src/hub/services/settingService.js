@@ -2,10 +2,10 @@ import HubDatabase from '../db';
 
 let hubDb;
 
-export const Settings = {
+export const SettingKeys = {
   OrganizationName: 'OrganizationName',
   OrganizationShortName: 'OrganizationShortName'
-}
+};
 
 export function createSettingService (config) {
   hubDb = new HubDatabase(config.database);
@@ -41,8 +41,15 @@ export function getSettings (keys) {
   });
 }
 
+export default {
+  createSettingService,
+  getSetting,
+  getSettings,
+  SettingKeys
+};
+
 function throwIfNotInitialized () {
   if (!hubDb) {
-    throw new Error('Settings service has not been initialized. Call createSettingsService first.');
+    throw new Error('Settings service has not been initialized. Call createSettingService first.');
   }
 }
