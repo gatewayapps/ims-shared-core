@@ -27,7 +27,9 @@ module.exports = {
         HubUrl: "HUB_URL",
         InitialState: "__INITIAL_STATE__",
         PackageId: "PACKAGE_ID",
-        RefreshToken: "rt"
+        RefreshToken: "rt",
+        PackageVersion: 'PACKAGE_VERSION',
+        PackageCommit: 'PACKAGE_COMMIT'
     },
     TokenTypes: {
         Package: 'package',
