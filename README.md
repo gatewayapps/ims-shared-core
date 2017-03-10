@@ -99,7 +99,7 @@ queueNotificationForPermission(permission, roleId, nodeIds, type, body[, callbac
 ```js
 import { queueNotificationForPermission } from 'ims-shared-core/notifications'
 
-queueNotificationForPermission('can-receive-approval-emails', nodeIds, type, body)
+queueNotificationForPermission('can-receive-approval-emails', 'admin', nodeIds, type, body)
   .then((notificationId) => {
     console.log(notificationId)
   })
