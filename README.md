@@ -77,6 +77,34 @@ queueNotificationForNodes(nodeIds, type, body)
   })
 ```
 
+#### Queue Notifications for Permission
+Import the queueNotificationForPermission method from ims-shared-core/notifications.
+
+queueNotificationForPermission(permission, roleId, nodeIds, type, body[, callback]) => Promise(notificationId)
+
+* **permission** - The permission held by a user(s) you wish to receive the notificaiton.
+* **roleId** - The roleId of the permission held by a user(s) you wish to receive the notificaiton.
+* **nodesIds** - array of nodeIds. The process will lookup the UserAccounts for which users within their scope will receive the notification.
+* **type** - notification type (in future will be used for determining notification preferences)
+* **body**
+  * **subject**
+  * **longContent** - email body
+  * sendAt - date of when to send the notification useful for scheduling future notifications
+  * shortContent - for future use with text notifications
+  * from - object to override where the email comes from
+    * name - display name in from address defaults to "IMS"
+    * address - from email address defaults to "noreply@mail.ims.gateway"
+* callback - optional callback with parameters (err, notificationId)
+
+```js
+import { queueNotificationForPermission } from 'ims-shared-core/notifications'
+
+queueNotificationForPermission('can-receive-approval-emails', nodeIds, type, body)
+  .then((notificationId) => {
+    console.log(notificationId)
+  })
+```
+
 ### Delete Queued Notification
 Useful for removing a scheduled future notification before it is sent. Import deleteNotification from ims-shared-core/notifications.
 

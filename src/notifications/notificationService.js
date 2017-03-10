@@ -106,6 +106,63 @@ export function queueNotificationForNodes (nodes, type, body, callback) {
   });
 }
 
+export function queueNotificationForPermission (permission, roleId, nodeIds, type, body, callback) {
+  // This local cb function is here to prevent a case where if the callback
+  // could get called twice should the error happen inside the queueNotification
+  // function that is called after finding userAccounts under the nodes.  
+  let callbackCount = 0;
+  const cb = function (err, notificationId) {
+    if (callbackCount === 0) {
+      const local = wrapCallback(callback);
+      local(err, notificationId);
+      callbackCount++;
+    }
+  };
+
+  if (!Array.isArray(nodeIds) || nodeIds.length === 0) {
+    const error = new TypeError('nodeIds should be an array with at least one value');
+    cb(error);
+    Promise.reject(error);
+  }
+
+  const query = 'EXECUTE [dbo].[usp_UserAccountsByPermission] @permission = :permission, @packageId = :packageId, @roleId = :roleId';
+
+  const usersPromise =  db.context.query(query, {
+    replacements: {
+      permission: permission,
+      packageId: config.packageId,
+      roleId: roleId
+    },
+    type: Sequelize.QueryTypes.SELECT
+  })
+
+  const scopePromise = db.context.query('SELECT DISTINCT ancestor FROM [dbo].[NodeClosures] WHERE [descendant] IN (:nodeIds)', {
+      replacements: {
+        nodeIds: nodeIds
+      },
+      type: Sequelize.QueryTypes.SELECT
+    }).then((result) => result.map((u) => u.ancestor))
+
+    return Promise.all([usersPromise, scopePromise])
+    .spread((userAccounts, scopes) => {
+
+      const denied = userAccounts.filter((u) => u.deny).map((uid) => uid.userAccountId)
+      //get all the users that aren't denied and have the scope of the nodeIds users
+      const to = userAccounts.filter((u) => denied.indexOf(u.userAccountId) < 0 && (checkScope(scopes, u.scope) || u.scope === 0 )).map((uid) => uid.userAccountId);
+      return queueNotification(to, type, body, cb);
+    })
+
+}
+
+function checkScope (scopes, scope){
+  for(var i in scopes){
+    if(scopes[i] === scope){
+      return true
+    }
+  }
+  return false
+}
+
 export function queueNotification (to, type, body, callback) {
   callback = wrapCallback(callback);
 
