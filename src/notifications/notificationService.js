@@ -119,6 +119,18 @@ export function queueNotificationForPermission (permission, roleId, nodeIds, typ
     }
   };
 
+  if (!permission) {
+    const error = new TypeError('permission should be a string with a value matching a corresponding ims permission');
+    cb(error);
+    Promise.reject(error);
+  }
+
+  if (!roleId) {
+    const error = new TypeError('roleId should be a string with a value matching a corresponding ims role, such as admin, super, or user');
+    cb(error);
+    Promise.reject(error);
+  }
+
   if (!Array.isArray(nodeIds) || nodeIds.length === 0) {
     const error = new TypeError('nodeIds should be an array with at least one value');
     cb(error);
