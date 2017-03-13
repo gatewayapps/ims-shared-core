@@ -9,7 +9,6 @@ const PermissionHandler = require('../lib/PermissionHandler')
 var permissionHelper
 var config
 
-
 Promise.promisifyAll(jwt)
 
 module.exports = (conf) => {
@@ -22,7 +21,7 @@ module.exports = (conf) => {
   }
 }
 
-function defaultHandler(req, res, next) {
+function defaultHandler (req, res, next) {
   const tokenHeader = req.headers['x-ims-authorization']
   if (tokenHeader) {
     const authParts = tokenHeader.split(' ')
@@ -45,7 +44,7 @@ function defaultHandler(req, res, next) {
   }
 }
 
-function swaggerHandler(req, authOrSecDef, scopesOrApiKey, next) {
+function swaggerHandler (req, authOrSecDef, scopesOrApiKey, next) {
   if (!scopesOrApiKey) {
     next(new UnauthorizedError('Access Token not provided'))
     return null
@@ -72,10 +71,9 @@ function swaggerHandler(req, authOrSecDef, scopesOrApiKey, next) {
   }
 
   return validate(req, token, next)
-
 }
 
-function validate(req, token, next) {
+function validate (req, token, next) {
   return jwt.verifyAsync(token, config.secret)
     .then(decodedToken => {
       req.context = decodedToken
@@ -111,7 +109,7 @@ function validate(req, token, next) {
     })
 }
 
-function checkNodePermissions(tree, node) {
+function checkNodePermissions (tree, node) {
   let permissions = []
 
   // build new permissions object with node related to this request.
