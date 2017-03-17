@@ -59,14 +59,8 @@ function PermissionHandler (imsConfig) {
   }
 
   this.findMatchingPermissions = function (permissions, roleAction) {
-    const higherRoles = []
     const permission = this.createPermissionFromString(roleAction)
-    if (permission.role !== Constants.Roles.Administrator) {
-      higherRoles.push(Constants.Roles.Administrator)
-    }
-    if (permission.role !== Constants.Roles.Supervisor) {
-      higherRoles.push(Constants.Roles.Supervisor)
-    }
+    const roleCheckValue = Constants.RoleValues[permission.role]
     return permissions.filter((p) => {
       return (
       p.package === this.ImsConfig.packageId &&
@@ -75,7 +69,7 @@ function PermissionHandler (imsConfig) {
           p.role === permission.role &&
           (p.action === permission.action || p.action === '*')
         ) || (
-          higherRoles.indexOf(p.role) > -1 && p.action === '*'
+          (Constants.RoleValues[p.role] > roleCheckValue && p.action === '*')
         )
       )
       )
