@@ -63,7 +63,7 @@ function PermissionHandler (imsConfig) {
     const roleCheckValue = Constants.RoleValues[permission.role]
     return permissions.filter((p) => {
       return (
-      p.package === this.ImsConfig.packageId &&
+      p.package === this.ImsConfig.package.id &&
       (
         (
           p.role === permission.role &&
