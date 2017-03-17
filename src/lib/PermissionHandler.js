@@ -44,6 +44,44 @@ function PermissionHandler (imsConfig) {
     })
   }
 
+  this.getGrantDenyNodesForPermission = function (permissions, roleAction) {
+    const matchedPermissions = this.findMatchingPermissions(permissions, roleAction)
+    const grantPermissions = matchedPermissions.filter((p) => { return p.type === Constants.RoleTypes.Grant })
+    const denyPermissions = matchedPermissions.filter((p) => { return p.type === Constants.RoleTypes.Deny })
+
+    const grantNodes = grantPermissions.map((p) => { return p.node === '*' ? 0 : parseInt(p.node) })
+    const denyNodes = denyPermissions.map((p) => { return p.node === '*' ? 0 : parseInt(p.node) })
+
+    return {
+      grantNodes: grantNodes,
+      denyNodes: denyNodes
+    }
+  }
+
+  this.findMatchingPermissions = function (permissions, roleAction) {
+    const higherRoles = []
+    const permission = this.createPermissionFromString(roleAction)
+    if (permission.role !== Constants.Roles.Administrator) {
+      higherRoles.push(Constants.Roles.Administrator)
+    }
+    if (permission.role !== Constants.Roles.Supervisor) {
+      higherRoles.push(Constants.Roles.Supervisor)
+    }
+    return permissions.filter((p) => {
+      return (
+      p.package === this.ImsConfig.packageId &&
+      (
+        (
+          p.role === permission.role &&
+          (p.action === permission.action || p.action === '*')
+        ) || (
+          higherRoles.indexOf(p.role) > -1 && p.action === '*'
+        )
+      )
+      )
+    })
+  }
+
   this.createPermissionFromString = function (permissionString) {
     var parts = permissionString.split(':')
 
@@ -57,7 +95,7 @@ function PermissionHandler (imsConfig) {
 
     if (parts.length === 2 || parts.length === 4) {
       // Did we include a type and package id
-      if (parts[0] === 'user' || parts[0] === 'super' || parts[0] === 'admin') {
+      if (parts[0] === Constants.Roles.User || parts[0] === Constants.Roles.Supervisor || parts[0] === Constants.Roles.Administrator) {
         // prepend grant and package
         parts.splice(0, 0, this.ImsConfig.package.id)
         parts.splice(0, 0, '+')
