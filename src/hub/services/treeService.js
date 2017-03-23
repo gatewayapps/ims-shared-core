@@ -1,16 +1,16 @@
-"use strict";
-const sorting = require('../helpers/sorting');
+'use strict'
+const sorting = require('../helpers/sorting')
 
 const TREES = {
   areas: 2,
   organization: 1
-};
+}
 
 const NODE_DETAIL_TYPES = {
   Branch: 1,
   UserAccount: 2,
-  Equipment: 3,
-};
+  Equipment: 3
+}
 
 module.exports = {
   nodeDetailTypes: NODE_DETAIL_TYPES,
@@ -18,21 +18,20 @@ module.exports = {
   getDescendantEquipment: getDescendantEquipment,
   getDescendantUserAccounts: getDescendantUserAccounts,
   getParentsObject: getParentsObject,
-  getStructuredTree: getStructuredTree,
-};
+  getStructuredTree: getStructuredTree
+}
 
-function buildDescendantQuery(db, nodes, options) {
-  options = options || {};
+function buildDescendantQuery (db, nodes, options) {
+  options = options || {}
 
-  const ancestorsWhere = {};
+  const ancestorsWhere = {}
 
   if (Array.isArray(nodes)) {
     ancestorsWhere.ancestor = {
       $in: nodes
     }
-  }
-  else {
-    ancestorsWhere.ancestor = nodes;
+  } else {
+    ancestorsWhere.ancestor = nodes
   }
 
   const queryOptions = {
@@ -46,71 +45,70 @@ function buildDescendantQuery(db, nodes, options) {
             model: db.NodeClosure,
             as: 'ancestors',
             attributes: [ ],
-            where: ancestorsWhere,
+            where: ancestorsWhere
           }
         ]
       }
     ]
-  };
+  }
 
   if (Array.isArray(options.attributes) && options.attributes.length > 0) {
-    queryOptions.attributes = options.attributes;
+    queryOptions.attributes = options.attributes
   }
 
   if (Array.isArray(options.order) && options.order.length > 0) {
-    queryOptions.order = options.order;
+    queryOptions.order = options.order
   }
 
-  return queryOptions;
+  return queryOptions
 }
 
-function getDescendantEquipment(db, nodes, options) {
-  const queryOptions = buildDescendantQuery(db, nodes, options);
+function getDescendantEquipment (db, nodes, options) {
+  const queryOptions = buildDescendantQuery(db, nodes, options)
 
-  return db.Equipment.findAll(queryOptions);
+  return db.Equipment.findAll(queryOptions)
 }
 
-function getDescendantUserAccounts(db, nodes, options) {
-  const queryOptions = buildDescendantQuery(db, nodes, options);
+function getDescendantUserAccounts (db, nodes, options) {
+  const queryOptions = buildDescendantQuery(db, nodes, options)
 
-  return db.UserAccount.findAll(queryOptions);
+  return db.UserAccount.findAll(queryOptions)
 }
 
-function getParentsObject(db) {
+function getParentsObject (db) {
   return db.Node.findAll({
-      attributes: [
-        'nodeId',
-        'parent'
-      ]
-    })
+    attributes: [
+      'nodeId',
+      'parent'
+    ]
+  })
     .then(nodes => {
-      const parentObj = {};
+      const parentObj = {}
 
       nodes.forEach(n => {
         parentObj[n.nodeId] = n.parent
-      });
+      })
 
-      return parentObj;
-    });
+      return parentObj
+    })
 }
 
-function getStructuredTree(db, treeNameOrId) {
-  let treeId = 0;
+function getStructuredTree (db, treeNameOrId) {
+  let treeId = 0
   if (typeof treeNameOrId === 'string') {
-    treeId = TREES[treeNameOrId.toLowerCase()];
-  }
-  else if (typeof treeNameOrId === 'number') {
-    treeId = treeNameOrId;
+    treeId = TREES[treeNameOrId.toLowerCase()]
+  } else if (typeof treeNameOrId === 'number') {
+    treeId = treeNameOrId
   }
 
   return getTreeNodes(db, treeId)
-    .then(convertNodesToStructuredTree);
+    .then(convertNodesToStructuredTree)
 }
 
-function getTreeNodes(db, treeId) {
+function getTreeNodes (db, treeId) {
   const query = {
     where: {
-      treeId: treeId,
+      treeId: treeId
     },
     attributes: [ 'nodeId', 'name', 'nodeDetailTypeId', 'treeId', 'parent', 'rank' ],
     include: [
@@ -147,41 +145,38 @@ function getTreeNodes(db, treeId) {
         attributes: [ 'userAccountId', 'firstName', 'lastName', 'displayName', 'email', 'jobTitle', 'homePhone', 'workPhone', 'cellPhone', 'profileImageUrl' ]
       }
     ]
-  };
+  }
 
-  return db.Node.findAll(query);
+  return db.Node.findAll(query)
 }
 
-function convertNodesToStructuredTree(nodes) {
-  if (!Array.isArray(nodes) || nodes.length === 0)
-    return [];
+function convertNodesToStructuredTree (nodes) {
+  if (!Array.isArray(nodes) || nodes.length === 0) { return [] }
 
   const treeStructure = nodes.filter(n => n.parent === 0)
-    .map(serializeTreeNode(nodes));
+    .map(serializeTreeNode(nodes))
 
-  return treeStructure;
+  return treeStructure
 }
 
-function serializeTreeNode(allNodes) {
+function serializeTreeNode (allNodes) {
   return (node) => {
     if (node.nodeDetailTypeId === NODE_DETAIL_TYPES.UserAccount) {
-      return serializeUserAccount(node);
-    }
-    else if (node.nodeDetailTypeId === NODE_DETAIL_TYPES.Equipment) {
-      return serializeEquipment(node);
-    }
-    else {
+      return serializeUserAccount(node)
+    } else if (node.nodeDetailTypeId === NODE_DETAIL_TYPES.Equipment) {
+      return serializeEquipment(node)
+    } else {
       const children = allNodes
         .filter(n => n.parent === node.nodeId)
         .sort(sorting.sortNodes)
-        .map(serializeTreeNode(allNodes));
+        .map(serializeTreeNode(allNodes))
 
-      return serializeBranch(node, children);
+      return serializeBranch(node, children)
     }
-  };
+  }
 }
 
-function serializeBranch(node, children) {
+function serializeBranch (node, children) {
   return {
     dataType: 'node',
     nodeId: node.nodeId,
@@ -189,19 +184,19 @@ function serializeBranch(node, children) {
     nodeDetailTypeId: node.nodeDetailTypeId,
     nodeTypeId: node.nodeType.nodeTypeId,
     nodeTypeName: node.nodeType.name,
-    children: children,
-  };
+    children: children
+  }
 }
 
-function serializeEquipment(node) {
+function serializeEquipment (node) {
   const serialized = {
     dataType: 'equipment',
     nodeId: node.nodeId,
     name: node.name,
     nodeDetailTypeId: node.nodeDetailTypeId
-  };
+  }
 
-  const eq = node.equipment;
+  const eq = node.equipment
   if (eq) {
     Object.assign(serialized, {
       equipmentId: eq.equipmentId,
@@ -212,22 +207,22 @@ function serializeEquipment(node) {
       modelId: eq.model ? eq.model.modelId : null,
       modelNumber: eq.model ? eq.model.modelNumber : null,
       assetNumber: eq.assetNumber,
-      description: eq.description,
-    });
+      description: eq.description
+    })
   }
 
-  return serialized;
+  return serialized
 }
 
-function serializeUserAccount(node) {
+function serializeUserAccount (node) {
   const serialized = {
     dataType: 'userAccount',
     nodeId: node.nodeId,
     name: node.name,
     nodeDetailTypeId: node.nodeDetailTypeId
-  };
+  }
 
-  const ua = node.userAccount;
+  const ua = node.userAccount
   if (ua) {
     Object.assign(serialized, {
       userAccountId: ua.userAccountId,
@@ -236,9 +231,9 @@ function serializeUserAccount(node) {
       displayName: ua.displayName,
       email: ua.email,
       jobTitle: ua.jobTitle,
-      profileImageUrl: ua.profileImageUrl,
-    });
+      profileImageUrl: ua.profileImageUrl
+    })
   }
 
-  return serialized;
+  return serialized
 }

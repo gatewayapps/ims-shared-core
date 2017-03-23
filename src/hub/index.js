@@ -4,6 +4,8 @@ const HubError = require('./HubError')
 const TreeHelper = require('../lib/TreeHelper')
 const treeService = require('./services/treeService')
 
+const userService = require('./services/userService')
+
 class Hub {
   constructor () {
     this.db = undefined
@@ -17,6 +19,20 @@ class Hub {
     if (this.db instanceof HubDatabase) { return true }
 
     return false
+  }
+
+  getUserAccount (userAccountId) {
+    if (!this._isInitialized()) {
+      throw new HubError('Hub has not been initialized.')
+    }
+
+    return userService.getUserAccount(this.db, userAccountId)
+  }
+  getUserAccounts (userAccountIds) {
+    if (!this._isInitialized()) {
+      throw new HubError('Hub has not been initialized.')
+    }
+    return userService.getUserAccounts(this.db, userAccountIds)
   }
 
   getDescendantEquipment (nodes, options) {
