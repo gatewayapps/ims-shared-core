@@ -40,6 +40,11 @@ module.exports = (Sequelize, dbContext) => {
       type: Sequelize.DATE,
       allowNull: false,
       defaultValue: Sequelize.NOW
+    },
+    rank: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   }, {
     tableName: 'PackageRoles',
