@@ -15,8 +15,6 @@ class HubDatabase {
     this.NodeClosure = require('./nodeClosure')(Sequelize, this.context)
     this.NodeType = require('./nodeType')(Sequelize, this.context)
     this.NotificationQueue = require('./notificationQueue')(Sequelize, this.context)
-    this.PackageRole = require('./packageRole')(Sequelize, this.context)
-    this.PackageRolePermission = require('./packageRolePermission')(Sequelize, this.context)
     this.Setting = require('./setting')(Sequelize, this.context)
     this.Tree = require('./tree')(Sequelize, this.context)
     this.UserAccount = require('./userAccount')(Sequelize, this.context)
@@ -42,10 +40,6 @@ class HubDatabase {
 
     // Node to Node ownerNodeId
     this.Node.belongsTo(this.Node, { as: 'owner', foreignKey: 'ownerNodeId' })
-
-    // PackageRole to PackageRolePermission
-    this.PackageRole.hasMany(this.PackageRolePermission, { as: 'permissions', foreignKey: 'packageRoleId' })
-    this.PackageRolePermission.belongsTo(this.PackageRole, { foreignKey: 'packageRoleId' })
 
     // UserAccount to Node
     this.UserAccount.belongsTo(this.Node, { foreignKey: 'nodeId' })
