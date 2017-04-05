@@ -35,6 +35,14 @@ class Hub {
     return userService.getUserAccounts(this.db, userAccountIds)
   }
 
+  getUserAccountsByTag (tag, ancestorNodeIds) {
+    if (!this._isInitialized()) {
+      throw new HubError('Hub has not been initialized.')
+    }
+
+    return userService.getUserAccountsByTag(this.db, tag, ancestorNodeIds)
+  }
+
   getDescendantEquipment (nodes, options) {
     if (!this._isInitialized()) {
       throw new HubError('Hub has not been initialized.')
