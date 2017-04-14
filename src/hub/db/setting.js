@@ -5,13 +5,22 @@ module.exports = (Sequelize, dbContext) => {
       primaryKey: true,
       allowNull: false
     },
+    settingsGroupId: {
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
+    dataType: {
+      type: Sequelize.STRING(100),
+      allowNull: false,
+      defaultValue: 'string'
+    },
     value: {
       type: Sequelize.STRING(255),
       allowNull: false
     },
     createdBy: {
       type: Sequelize.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     createdDate: {
       type: Sequelize.DATE,
@@ -20,7 +29,7 @@ module.exports = (Sequelize, dbContext) => {
     },
     modifiedBy: {
       type: Sequelize.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     modifiedDate: {
       type: Sequelize.DATE,
