@@ -1,5 +1,4 @@
 'use strict'
-const uuid = require('uuid')
 const uuidv4 = require('uuid/v4')
 const bb = require('express-busboy')
 const mkdirp = require('mkdirp')
@@ -19,10 +18,14 @@ const move = require('../utils/move')
 const ERROR_NO_FILE_PRESENT = 'Request files was empty or undefined'
 const ERROR_FILE_WRITE = 'There was an error writing the file to disk'
 
-
 module.exports = (app, config, options) => {
   var auth = AuthenticationMiddleware(config)
-  mkdirp(path.join(config.fileStoragePath, 'uploads'), (err) => {
+
+  const uploadsPath = config.uploadsPath
+    ? config.uploadsPath
+    : path.join(config.fileStoragePath, 'uploads')
+
+  mkdirp(uploadsPath, (err) => {
     if (err) {
       console.error(err)
     } else {
@@ -33,7 +36,7 @@ module.exports = (app, config, options) => {
     upload: true
   })
   app.post('/api/upload', auth.defaultMiddleware, (req, res) => {
-    //if there's no file, this should error out
+    // if there's no file, this should error out
     if (!req.files || req.files.length < 1) {
       if (options.errorCallback) {
         options.errorCallback(ERROR_NO_FILE_PRESENT)
@@ -41,27 +44,25 @@ module.exports = (app, config, options) => {
         res.json({ success: false, message: ERROR_NO_FILE_PRESENT })
       }
     } else {
-
-
       var id
-      //If options has a generator, use it
+      // If options has a generator, use it
       if (options.idGenerator) {
         id = options.idGenerator()
       } else {
-        //Otherwise just a uuidv4
+        // Otherwise just a uuidv4
         id = uuidv4()
       }
 
-      //tempPath is where node has stored the file temporarily
+      // tempPath is where node has stored the file temporarily
       var tempPath = req.files.file.file
-      //Get filename from temp path
+      // Get filename from temp path
       var fileName = path.basename(tempPath)
-      //The final location of the uploaded file.  This gets passed to callback
+      // The final location of the uploaded file.  This gets passed to callback
       var finalPath = generateLocalPath(config, id, fileName)
-      //Get the mime type
+      // Get the mime type
       var mimeType = mime.lookup(tempPath)
 
-      //Move the file to it's new location
+      // Move the file to it's new location
       move(tempPath, finalPath).then((err) => {
         if (err) {
           if (options.errorCallback) {
@@ -80,15 +81,13 @@ module.exports = (app, config, options) => {
             size: stats['size']
           })
 
-          //The move didn't fail, so we are done here.  
-
+          // The move didn't fail, so we are done here.
         }
       })
     }
   })
 }
 
-
-function generateLocalPath(config, id, fileName) {
+function generateLocalPath (config, id, fileName) {
   return path.resolve(path.join(config.fileStoragePath, 'uploads', `${id}-${fileName}`))
 }

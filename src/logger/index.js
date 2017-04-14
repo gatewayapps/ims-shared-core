@@ -1,8 +1,8 @@
 'use strict'
-const url = require('url');
+const url = require('url')
 const bunyan = require('bunyan')
 const path = require('path')
-const fs = require('fs')
+const mkdirp = require('mkdirp')
 const bunyanDebugStream = require('bunyan-debug-stream')
 var loggerInstance // singleton
 
@@ -26,15 +26,16 @@ var loggerWrapper = {
 
 export default loggerWrapper
 
-export function createLogger(config, subFileName) {
-  const logPath = path.join(config.fileStoragePath, 'logs')
+export function createLogger (config, subFileName) {
+  const logPath = config.logPath
+    ? config.logPath
+    : path.join(config.fileStoragePath, 'logs')
 
-  try {
-    fs.statSync(logPath)
-  } catch (e) {
-    fs.mkdirSync(logPath)
-  }
-
+  mkdirp(logPath, (err) => {
+    if (err) {
+      console.error(err)
+    }
+  })
 
   const DEBUG_STREAMS = [{
     level: 'debug',
@@ -66,16 +67,14 @@ export function createLogger(config, subFileName) {
     streams: process.env.NODE_ENV === 'development' ? DEBUG_STREAMS : PROD_STREAMS
   })
   loggerInstance.api = (req) => {
-    var user = "GUEST/0"
+    var user = 'GUEST/0'
     if (req.context) {
       user = `${req.context.displayName}/${req.context.userAccountId}`
     }
     loggerInstance.info(`[API CALL]: (${user}) - ${req.method} ${fullUrl(req)}`)
     if (req.body) {
       loggerInstance.info(`[REQUEST BODY]`, req.body)
-    } 
-
-
+    }
   }
 
   loggerInstance.url = (message) => {
@@ -83,10 +82,10 @@ export function createLogger(config, subFileName) {
   }
 }
 
-function fullUrl(req) {
+function fullUrl (req) {
   return url.format({
     protocol: req.protocol,
     hostname: req.get('Host').toString().replace('[', '').replace(']', ''),
     pathname: req.originalUrl
-  });
+  })
 }
