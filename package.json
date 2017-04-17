@@ -1,6 +1,6 @@
 {
   "name": "ims-shared-core",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "",
   "babel": {
     "presets": [
@@ -17,24 +17,20 @@
     "type": "git",
     "url": "git+https://github.com/gatewayapps/ims-shared-core.git"
   },
-  "author": "Daniel Gary <daniel@gatewayapps.com> (http://www.gatewayapps.com), Justin Neff <justin@gatewayapps.com> (http://www.gatewayapps.com)",
+  "author": "Gateway Apps, LLC",
+  "contributors": [
+    "Daniel Gary <daniel@gatewayapps.com> (http://www.gatewayapps.com)",
+    "Justin Neff <justin@gatewayapps.com> (http://www.gatewayapps.com)"
+  ],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/gatewayapps/ims-shared-core/issues"
   },
   "homepage": "https://github.com/gatewayapps/ims-shared-core#readme",
   "dependencies": {
-    "babel-eslint": "^7.1.1",
     "bluebird": "^3.4.3",
     "bunyan": "^1.8.5",
     "bunyan-debug-stream": "^1.0.7",
-    "eslint": "^3.17.1",
-    "eslint-config-standard": "^7.0.1",
-    "eslint-config-standard-react": "^4.3.0",
-    "eslint-plugin-babel": "^4.1.1",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-react": "^6.10.0",
-    "eslint-plugin-standard": "^2.1.1",
     "express-busboy": "^5.0.0",
     "google-libphonenumber": "^1.0.22",
     "jsonwebtoken": "^7.1.9",
@@ -48,6 +44,14 @@
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-cli": "^6.14.0",
-    "babel-preset-es2015": "^6.14.0"
+    "babel-eslint": "^7.1.1",
+    "babel-preset-es2015": "^6.14.0",
+    "eslint": "^3.17.1",
+    "eslint-config-standard": "^7.0.1",
+    "eslint-config-standard-react": "^4.3.0",
+    "eslint-plugin-babel": "^4.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-react": "^6.10.0",
+    "eslint-plugin-standard": "^2.1.1"
   }
 }
