@@ -15,16 +15,18 @@ var socket, context, pendingRequests
 pendingRequests = {}
 
 module.exports = {
-  use: function use (config) {
+  use: function use (config, options) {
     var _this = this
-
+    _this.options = options || {}
     context = config
     socket = io(context.hubUrl)
 
     socket.on('connect', function (ev) {
       console.log('Connected to ' + context.hubUrl)
       _this.emit('register', { package: context.packageId, contents: {} })
-      hub.refreshParentNodes()
+      if (!_this.options.disableTreeCache) {
+        hub.refreshParentNodes()
+      }
     })
 
     socket.on('response', function (contents) {
@@ -34,7 +36,9 @@ module.exports = {
       }
     })
     socket.on(constants.SocketEvents.TreeModifiedEvent, function (contents) {
-      hub.refreshParentNodes()
+      if (!_this.options.disableTreeCache) {
+        hub.refreshParentNodes()
+      }
     })
     socket.on('error', function (contents) {
       if (pendingRequests[contents.id]) {

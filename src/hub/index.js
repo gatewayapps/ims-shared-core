@@ -61,6 +61,7 @@ class Hub {
 
   refreshParentNodes () {
     console.log('Refreshing parent nodes')
+
     return treeService.getParentsObject(this.db).then((nodeParents) => {
       TreeHelper.setNodeParents(nodeParents)
       console.log('Parent nodes refreshed')
