@@ -1,5 +1,6 @@
 import Promise from 'bluebird'
 import Sequelize from 'sequelize'
+import mime from 'mime-types'
 import HubDatabase from '../hub/db'
 
 let _db
@@ -186,7 +187,8 @@ export function queueNotification (to, type, body, callback) {
 
     const notification = Object.assign({}, body, {
       to: to,
-      type: type
+      type: type,
+      attachments: undefined
     })
 
     const sendDate = body.sendAt || Date.now()
@@ -197,11 +199,17 @@ export function queueNotification (to, type, body, callback) {
       stateId: 1, // Queued
       sendDate: sendDate,
       message: JSON.stringify(notification)
-    }).then((queueItem) => {
+    })
+    .then((queueItem) => {
+      return saveNotificationAttachments(queueItem.notificationId, body.attachments)
+        .then(() => queueItem)
+    })
+    .then((queueItem) => {
       _logger(queueItem.toJSON())
       callback(null, queueItem.notificationId)
       return queueItem.notificationId
-    }).catch((error) => {
+    })
+    .catch((error) => {
       _logger(`Error: ${JSON.stringify(error)}`)
       callback(error)
       throw error
@@ -210,6 +218,24 @@ export function queueNotification (to, type, body, callback) {
     callback(e)
     return Promise.reject(e)
   }
+}
+
+function saveNotificationAttachments (notificationId, attachments) {
+  if (!Array.isArray(attachments) || attachments.length === 0) {
+    return Promise.resolve(notificationId)
+  }
+
+  const attachPromises = attachments.map((attach) => {
+    return _db.NotificationAttachment.create({
+      notificationId: notificationId,
+      filename: attach.filename,
+      contentType: mime.lookup(attach.filename) || 'application/octet-stream',
+      contentSize: attach.content.length,
+      content: attach.content
+    })
+  })
+
+  return Promise.all(attachPromises).then(() => notificationId)
 }
 
 function validateNotification (to, type, body) {
@@ -234,8 +260,24 @@ function validateNotification (to, type, body) {
     throw new TypeError('body.subject is a required string')
   }
 
-  if (typeof body.longContent !== 'string' || body.longContent === 0) {
+  if (typeof body.longContent !== 'string' || body.longContent.length === 0) {
     throw new TypeError('body.longContent is a required string')
+  }
+
+  if (body.attachments) {
+    if (!Array.isArray(body.attachments)) {
+      throw new TypeError('body.attachments should be an array')
+    } else {
+      body.attachments.forEach((attach, index) => {
+        if (typeof attach.filename !== 'string' || attach.filename.length === 0) {
+          throw new TypeError(`body.attachments[${index}].filename is a required string`)
+        }
+
+        if (!(attach.content instanceof Buffer) || attach.content.length === 0) {
+          throw new TypeError(`body.attachments[${index}].content is a required Buffer of the file contents`)
+        }
+      })
+    }
   }
 }
 
