@@ -88,7 +88,7 @@ export function queueNotificationForNodes (nodes, type, body, callback) {
   if (!Array.isArray(nodes) || nodes.length === 0) {
     const error = new TypeError('nodes should be an array with at least one value')
     cb(error)
-    Promise.reject(error)
+    return Promise.reject(error)
   }
 
   let query = `SELECT v.userAccountId FROM [dbo].[v_UserAccounts] v
