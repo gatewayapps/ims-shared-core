@@ -14,6 +14,7 @@ class HubDatabase {
     this.NodeDetailType = require('./nodeDetailType')(Sequelize, this.context)
     this.NodeClosure = require('./nodeClosure')(Sequelize, this.context)
     this.NodeType = require('./nodeType')(Sequelize, this.context)
+    this.NotificationAttachment = require('./NotificationAttachment')(Sequelize, this.context)
     this.NotificationQueue = require('./notificationQueue')(Sequelize, this.context)
     this.Setting = require('./setting')(Sequelize, this.context)
     this.Tree = require('./tree')(Sequelize, this.context)
