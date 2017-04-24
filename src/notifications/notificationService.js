@@ -2,33 +2,33 @@ import Promise from 'bluebird'
 import Sequelize from 'sequelize'
 import HubDatabase from '../hub/db'
 
-let db
-let defaultBody = {}
-let logger = function () {}
+let _db
+let _defaultBody = {}
+let _logger = function () {}
 let _packageId
 
 export function createNotificationService (config, options) {
   options = options || {}
 
   if (typeof options.log === 'function') {
-    logger = options.log
+    _logger = options.log
   }
 
   _packageId = config.packageId
 
-  defaultBody = {
+  _defaultBody = {
     packageId: config.packageId
   }
 
-  logger('Creating HubDatabase for NotificationService')
-  db = new HubDatabase(config.database)
+  _logger('Creating HubDatabase for NotificationService')
+  _db = new HubDatabase(config.database)
 }
 
 export function deleteNotification (notificationId, callback) {
   callback = wrapCallback(callback)
 
   const deleteCmd = 'EXECUTE [dbo].[usp_DeleteQueuedNotification] @i_notificationId = :notificationId'
-  return db.context.query(deleteCmd, {
+  return _db.context.query(deleteCmd, {
     replacements: {
       notificationId: notificationId
     },
@@ -47,7 +47,7 @@ export function deleteNotification (notificationId, callback) {
     error.notificationId = notificationId
     throw error
   }).catch((error) => {
-    logger(`Error: ${JSON.stringify(error)}`)
+    _logger(`Error: ${JSON.stringify(error)}`)
     callback(error)
     throw error
   })
@@ -55,7 +55,7 @@ export function deleteNotification (notificationId, callback) {
 
 export function deleteNotifications (notificationIds, callback) {
   callback = wrapCallback(callback)
-  return db.NotificationQueue.destroy({
+  return _db.NotificationQueue.destroy({
     where: {
       notificationId: {
         $in: notificationIds
@@ -66,7 +66,7 @@ export function deleteNotifications (notificationIds, callback) {
     callback(null, true)
     return true
   }).catch((error) => {
-    logger(`Error: ${JSON.stringify(error)}`)
+    _logger(`Error: ${JSON.stringify(error)}`)
     callback(error)
     throw error
   })
@@ -95,7 +95,7 @@ export function queueNotificationForNodes (nodes, type, body, callback) {
     WHERE EXISTS (SELECT 1 FROM [dbo].[NodeClosures] nc WHERE nc.descendant = v.nodeId
       AND nc.isDeleted = 0 AND nc.ancestor IN (:include))`
 
-  return db.context.query(query, {
+  return _db.context.query(query, {
     replacements: {
       include: nodes
     },
@@ -142,7 +142,7 @@ export function queueNotificationForPermission (permission, roleId, nodeIds, typ
 
   const query = 'EXECUTE [dbo].[usp_UserAccountsByPermission] @permission = :permission, @packageId = :packageId, @roleId = :roleId'
 
-  const usersPromise = db.context.query(query, {
+  const usersPromise = _db.context.query(query, {
     replacements: {
       permission: permission,
       packageId: _packageId,
@@ -151,7 +151,7 @@ export function queueNotificationForPermission (permission, roleId, nodeIds, typ
     type: Sequelize.QueryTypes.SELECT
   })
 
-  const scopePromise = db.context.query('SELECT DISTINCT ancestor FROM [dbo].[NodeClosures] WHERE [descendant] IN (:nodeIds)', {
+  const scopePromise = _db.context.query('SELECT DISTINCT ancestor FROM [dbo].[NodeClosures] WHERE [descendant] IN (:nodeIds)', {
     replacements: {
       nodeIds: nodeIds
     },
@@ -180,7 +180,7 @@ export function queueNotification (to, type, body, callback) {
   callback = wrapCallback(callback)
 
   try {
-    body = Object.assign({}, defaultBody, body)
+    body = Object.assign({}, _defaultBody, body)
 
     validateNotification(to, type, body)
 
@@ -191,18 +191,18 @@ export function queueNotification (to, type, body, callback) {
 
     const sendDate = body.sendAt || Date.now()
 
-    logger('Creating item in Notification Queue')
+    _logger('Creating item in Notification Queue')
 
-    return db.NotificationQueue.create({
+    return _db.NotificationQueue.create({
       stateId: 1, // Queued
       sendDate: sendDate,
       message: JSON.stringify(notification)
     }).then((queueItem) => {
-      logger(queueItem.toJSON())
+      _logger(queueItem.toJSON())
       callback(null, queueItem.notificationId)
       return queueItem.notificationId
     }).catch((error) => {
-      logger(`Error: ${JSON.stringify(error)}`)
+      _logger(`Error: ${JSON.stringify(error)}`)
       callback(error)
       throw error
     })
@@ -213,7 +213,7 @@ export function queueNotification (to, type, body, callback) {
 }
 
 function validateNotification (to, type, body) {
-  logger('Validating notification: ', JSON.stringify({ to: to, type: type, body: body }))
+  _logger('Validating notification: ', JSON.stringify({ to: to, type: type, body: body }))
   if (!Array.isArray(to) || to.length === 0) {
     throw new TypeError('to should be an array with at list one value')
   }
