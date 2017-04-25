@@ -40,6 +40,9 @@ queueNotification(to, type, body[, callback]) => Promise(notificationId)
   * from - object to override where the email comes from
     * name - display name in from address defaults to "IMS"
     * address - from email address defaults to "noreply@mail.ims.gateway"
+  * attachments - array of attachment objects to include in the notification with following structures
+    * filename: name of the attachment including file extension that will be used in the notification. Ex: 'MyFile.pdf'
+    * content: ```Buffer``` of the attachment file data
 * callback - optional callback with parameters (err, notificationId)
 
 ```js
@@ -66,6 +69,9 @@ queueNotificationForNodes(nodes, type, body[, callback]) => Promise(notification
   * from - object to override where the email comes from
     * name - display name in from address defaults to "IMS"
     * address - from email address defaults to "noreply@mail.ims.gateway"
+  * attachments - array of attachment objects to include in the notification with following structures
+    * filename: name of the attachment including file extension that will be used in the notification. Ex: 'MyFile.pdf'
+    * content: ```Buffer``` of the attachment file data
 * callback - optional callback with parameters (err, notificationId)
 
 ```js
@@ -94,6 +100,9 @@ queueNotificationForPermission(permission, roleId, nodeIds, type, body[, callbac
   * from - object to override where the email comes from
     * name - display name in from address defaults to "IMS"
     * address - from email address defaults to "noreply@mail.ims.gateway"
+  * attachments - array of attachment objects to include in the notification with following structures
+    * filename: name of the attachment including file extension that will be used in the notification. Ex: 'MyFile.pdf'
+    * content: ```Buffer``` of the attachment file data
 * callback - optional callback with parameters (err, notificationId)
 
 ```js
