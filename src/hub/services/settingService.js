@@ -1,14 +1,21 @@
-import HubDatabase from '../db';
+import HubDatabase from '../db'
 
-let hubDb;
+let hubDb
 
 export const SettingKeys = {
+  OrganizationAddress: 'OrganizationAddress',
+  OrganizationCity: 'OrganizationCity',
+  OrganizationIndustryDesc: 'OrganizationIndustryDesc',
+  OrganizationNAICS: 'OrganizationNAICS',
   OrganizationName: 'OrganizationName',
-  OrganizationShortName: 'OrganizationShortName'
-};
+  OrganizationShortName: 'OrganizationShortName',
+  OrganizationSIC: 'OrganizationSIC',
+  OrganizationState: 'OrganizationState',
+  OrganizationZip: 'OrganizationZip'
+}
 
 export function createSettingService (config) {
-  hubDb = new HubDatabase(config.database);
+  hubDb = new HubDatabase(config.database)
 }
 
 export function getSetting (key) {
@@ -19,12 +26,12 @@ export function getSetting (key) {
       key: key
     }
   }).then((setting) => {
-    return setting.value;
-  });
+    return setting.value
+  })
 }
 
 export function getSettings (keys) {
-  throwIfNotInitialized();
+  throwIfNotInitialized()
 
   return hubDb.Setting.findAll({
     where: {
@@ -34,11 +41,11 @@ export function getSettings (keys) {
     }
   }).then((settings) => {
     const settingsObj = settings.reduce((obj, s) => {
-      obj[s.key] = s.value;
-      return obj;
-    }, {});
-    return settingsObj;
-  });
+      obj[s.key] = s.value
+      return obj
+    }, {})
+    return settingsObj
+  })
 }
 
 export default {
@@ -46,10 +53,10 @@ export default {
   getSetting,
   getSettings,
   SettingKeys
-};
+}
 
 function throwIfNotInitialized () {
   if (!hubDb) {
-    throw new Error('Settings service has not been initialized. Call createSettingService first.');
+    throw new Error('Settings service has not been initialized. Call createSettingService first.')
   }
 }
