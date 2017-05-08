@@ -40,6 +40,9 @@ module.exports = (Sequelize, dbContext) => {
     profileImageUrl: {
       type: Sequelize.STRING(500)
     },
+    birthday: {
+      type: Sequelize.DATE
+    },
     hireDate: {
       type: Sequelize.DATE
     },
@@ -61,13 +64,13 @@ module.exports = (Sequelize, dbContext) => {
     },
     createdBy: {
       type: Sequelize.INTEGER,
-      "x-prevent-update": false
+      'x-prevent-update': false
     },
     createdDate: {
       type: Sequelize.DATE,
       allowNull: false,
       defaultValue: Sequelize.NOW,
-      "x-prevent-update": false
+      'x-prevent-update': false
     },
     modifiedBy: {
       type: Sequelize.INTEGER
@@ -91,5 +94,5 @@ module.exports = (Sequelize, dbContext) => {
         }
       }
     }
-  });
-};
+  })
+}
