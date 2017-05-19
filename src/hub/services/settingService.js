@@ -11,6 +11,7 @@ export const SettingKeys = {
   OrganizationShortName: 'OrganizationShortName',
   OrganizationSIC: 'OrganizationSIC',
   OrganizationState: 'OrganizationState',
+  OrganizationTimezone: 'OrganizationTimezone',
   OrganizationZip: 'OrganizationZip'
 }
 
