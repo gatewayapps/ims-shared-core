@@ -149,3 +149,54 @@ The service attempts to send a notification four times. On the fourth failed att
 * payload
   * type: 'NOTIFICATION_FAILED'
   * notificationId
+
+## ImageCache Middleware
+Middleware for resizing and storing cached resized versions of images.
+
+### Setup
+The import returns a function that generates an Express middleware function to handling image resize and caching.
+
+ImageCache(options) => function (req, res, next)
+
+* **options**
+  * cacheDir - full path to location to store cached image files defaults to os.tmpdir() + '/ims-cache'
+  * debugLogger - function to use when logging debug output default does not log anything
+    * Signature: function ([data][,...args])
+  * errorLogger - function to use when logging error output default to console.error
+    * Signature: function ([data][,...args])
+  * **getRawStream** - function to load the stream of an image that is not in the cache
+    * Signature: function (imageId) => Promise<Stream>
+  * reqIdParam - path parameter name of image id defaults to 'id'
+
+```js
+import { ImageCache } from 'ims-shared-core/dist/middlewares'
+import logger from 'ims-shared-core/logger'
+import attachmentService from './services/attachment'
+
+// logic to create Express app
+
+app.get('/api/images/:id', ImageCache({
+  cacheDir: '/path/to/store/cached/images',
+  debugLogger: logger.debug,
+  errorLogger: logger.error,
+  getRawStream: attachmentService.getStream
+}))
+```
+
+### Requesting Images
+To request images from the cache use the path defined when looking up the middleware in your server. Size constraints are passed as query string arguments to the request. Images are resized 
+
+* Query string arguments
+  * h - maximum height for the image
+  * w - maximum width for the image
+
+Examples:
+
+* Request an image at the original size
+  * ```/api/images/A5E4C39F-3BCF-438F-9D5B-DD6A52FDA6AC```
+* Request an image with a maximum width of 500px
+  * ```/api/images/A5E4C39F-3BCF-438F-9D5B-DD6A52FDA6AC?w=500```
+* Request an image with a maximum height of 300px
+  * ```/api/images/A5E4C39F-3BCF-438F-9D5B-DD6A52FDA6AC?h=300```
+* Request an image with a maximum height of 300px and maximum width of 500px
+  * ```/api/images/A5E4C39F-3BCF-438F-9D5B-DD6A52FDA6AC?h=300&w=500```
