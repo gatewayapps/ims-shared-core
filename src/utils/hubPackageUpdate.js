@@ -1,10 +1,10 @@
 import fetch from 'isomorphic-fetch'
-import signData from './signData'
+import createSignature from './createSignature'
 import Constants from '../lib/constants'
 
 export default function hubPackageUpdate (hubUrl, packageSecret, imsConfig) {
   try {
-    const payloadSignature = signData(imsConfig, packageSecret)
+    const payloadSignature = createSignature(imsConfig, packageSecret)
     const postData = {
       data: imsConfig,
       signature: payloadSignature
