@@ -170,7 +170,7 @@ function PermissionHandler (imsConfig) {
         // Does this user permission role match the permission role we are checking
         if (p.role === permission.role) {
           // Does this user permission action match all or match the permission we are checking
-          if (p.action === permission.action || p.action === '*') {
+          if (p.action === permission.action || p.action === '*' || permission.action === '?') {
             // Does this user permission apply to everything or only to a specific tree?
             // If it's a specific tree, does it match the one we are checking against
 
