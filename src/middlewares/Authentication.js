@@ -2,7 +2,7 @@
 
 const Promise = require('bluebird')
 const jwt = require('jsonwebtoken')
-
+const constants = require('../lib/constants')
 const UnauthorizedError = require('./Errors/UnauthorizedError')
 const ForbiddenError = require('./Errors/ForbiddenError')
 const PermissionHandler = require('../lib/PermissionHandler')
@@ -77,26 +77,27 @@ function validate (req, token, next) {
   return jwt.verifyAsync(token, config.secret)
     .then(decodedToken => {
       req.context = decodedToken
-      req.context.permissions = permissionHelper.createPermissionsArrayFromStringsArray(req.context.claims)
-      req.checkNodePermissions = checkNodePermissions.bind(req)
+      if (req.context.type === constants.TokenTypes.User) {
+        req.context.permissions = permissionHelper.createPermissionsArrayFromStringsArray(req.context.claims)
+        req.checkNodePermissions = checkNodePermissions.bind(req)
 
       // The token has been verified as good
 
-      if (req.swagger) {
+        if (req.swagger) {
         // Now verify route specific permissions
-        const requiredPermissions = req.swagger.operation['x-required-permissions']
-        if (requiredPermissions) {
-          if (!Array.isArray(requiredPermissions)) {
-            throw new Error('Invalid value in swagger definition for "x-required-permissions"')
-          }
+          const requiredPermissions = req.swagger.operation['x-required-permissions']
+          if (requiredPermissions) {
+            if (!Array.isArray(requiredPermissions)) {
+              throw new Error('Invalid value in swagger definition for "x-required-permissions"')
+            }
 
-          if (permissionHelper.checkPermissions(requiredPermissions, req.context.permissions, true) !== true) {
-            next(new ForbiddenError('User Account does not have sufficient permissions for this request.'))
-            return null
+            if (permissionHelper.checkPermissions(requiredPermissions, req.context.permissions, true) !== true) {
+              next(new ForbiddenError('User Account does not have sufficient permissions for this request.'))
+              return null
+            }
           }
         }
       }
-
       next()
       return null
     })
