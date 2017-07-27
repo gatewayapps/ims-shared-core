@@ -24,6 +24,11 @@ module.exports = (Sequelize, dbContext) => {
       allowNull: false,
       defaultValue: 0
     },
+    sendCount: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
     message: {
       type: Sequelize.STRING,
       allowNull: false
