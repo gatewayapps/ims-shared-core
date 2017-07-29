@@ -103,7 +103,8 @@ function validate (req, token, next) {
     })
     .catch(err => {
       if (err.name !== 'TokenExpiredError') {
-        console.log({ err: err })
+        console.error('Token failed to verify', token)
+        console.error({ err: err })
       }
       next(err)
       return null
