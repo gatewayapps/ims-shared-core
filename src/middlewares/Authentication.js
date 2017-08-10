@@ -11,7 +11,7 @@ var config
 
 Promise.promisifyAll(jwt)
 
-module.exports = (conf) => {
+export default function createAuthenticationMiddleware (conf) {
   config = conf
   permissionHelper = new PermissionHandler({ package: { id: config.packageId } })
   return {
