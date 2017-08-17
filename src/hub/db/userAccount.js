@@ -43,9 +43,6 @@ module.exports = (Sequelize, dbContext) => {
     birthday: {
       type: Sequelize.DATE
     },
-    userStatusId: {
-      type: Sequelize.INTEGER
-    },
     hireDate: {
       type: Sequelize.DATE
     },
