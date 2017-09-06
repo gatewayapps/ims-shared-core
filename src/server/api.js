@@ -3,10 +3,12 @@ import SwaggerExpress from 'swagger-express-mw'
 import logger from '../logger'
 import createAuthenticationMiddleware from '../middlewares/Authentication'
 import FileUploadMiddleware from '../middlewares/FileUpload'
+import ImageCache from '../middlewares/ImageCache'
 
 /* requestHandlers structure
   - onFileUploadRequest : (req,res, fileDetails)
   - onFileDownloadRequest: (req, res, next)
+  - onGetRawStreamRequest (id)
   - onBadgesRequest: (req, res, next) => Promise<number>
 */
 
@@ -77,6 +79,13 @@ export default class Api {
     // Connect file upload and download middlewares
     FileUploadMiddleware(app, this.serverConfig, { uploadCallback: this.requestHandlers.onFileUploadRequest })
     app.get('/api/download/:id', this.requestHandlers.onFileDownloadRequest)
+
+    app.get('/api/images/:id', ImageCache({
+      cacheDir: this.serverConfig.cachePath,
+      debugLogger: logger.debug,
+      errorLogger: logger.error,
+      getRawStream: this.requestHandlers.onGetRawStreamRequest // attachmentService.getStreamAsync
+    }))
 
     // Send the swagger file if it's requested
     app.get('/swagger', (req, res) => {

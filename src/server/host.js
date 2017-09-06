@@ -17,6 +17,7 @@ const COOKIE_EXPIRY = 2147483647
   Options
   - onFileUploadRequest : (req,res,next)
   - onFileDownloadRequest: (req, res, next)
+  - onGetRawStreamRequest: (id)
   - onBadgesRequest: (userContext) => Promise<number>
   - onUnhandledException: (err)
   - swagger: {
@@ -78,6 +79,7 @@ export default class Host {
     const api = new Api(this.serverConfig, this.options.swagger, [], {
       onFileUploadRequest : this.options.onFileUploadRequest,
       onFileDownloadRequest: this.options.onFileDownloadRequest || this.defaultFileDownloadRequestHandler,
+      onGetRawStreamRequest: this.options.onGetRawStreamRequest || this.defaultGetRawStreamHandler,
       onBadgesRequest: this.options.onBadgesRequest || this.defaultBadgesRequestHandler
     }, this.handleException)
 
@@ -107,6 +109,9 @@ export default class Host {
   }
   defaultFileDownloadRequestHandler (req, res, next) {
     res.status(404).send()
+  }
+  defaultGetRawStreamHandler (req, res) {
+    return Promise.reject(new Error('Get raw stream handler not defined'))
   }
 
   processAuthenticationRequest (req, res, next) {
