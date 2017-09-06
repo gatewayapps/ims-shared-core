@@ -7,6 +7,7 @@ import Api from './api'
 
 import { createLogger, default as logger } from '../logger'
 import { createNotificationService } from '../notifications/notificationService'
+import { createSettingService } from '../hub/services/settingService'
 import { hubPackageUpdate, uploadMigrationFile, prepareRequest } from '../utils'
 import Constants from '../lib/constants'
 
@@ -40,6 +41,7 @@ export default class Host {
     // Create logger and notification service
     createLogger(serverConfig)
     createNotificationService(serverConfig)
+    createSettingService(serverConfig)
     prepareRequest(this.serverConfig.hubUrl, this.serverConfig.secret, packageDef)
 
     // wire up exception handling
@@ -114,17 +116,9 @@ export default class Host {
 
   processAuthenticationRequest (req, res, next) {
     if (req.query.refreshToken) {
-      const domainParts = this.serverConfig.hubUrl.split('.')
-      domainParts.splice(0, 1)
-      const domainBase = `.${domainParts.join('.')}`
-      console.log('domainBase WOULD be ', domainBase)
-      res.cookie(Constants.Cookies.RefreshToken, req.query.refreshToken, { expires: moment().add(30, 'days').toDate(), domain: process.env.NODE_ENV === 'development' ? 'localhost' : domainBase })
-
-      res.redirect(req.query.return || '/')
-      // return next()
-      res.send()
-    } else {
-      res.redirect(req.query.return || '/')
+      res.cookie(Constants.Cookies.RefreshToken, req.query.refreshToken, { expires: moment().add(30, 'days').toDate() })
     }
+    res.redirect(req.query.return || '/')
+    res.send()
   }
 }
