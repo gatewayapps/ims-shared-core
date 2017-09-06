@@ -76,7 +76,7 @@ export default class Host {
 
     app.get('/authenticate', this.processAuthenticationRequest.bind(this))
 
-    const api = new Api(this.serverConfig, this.options.swagger, [], {
+    const api = new Api(this.serverConfig, this.options.swagger, this.options.middlewares, {
       onFileUploadRequest : this.options.onFileUploadRequest,
       onFileDownloadRequest: this.options.onFileDownloadRequest || this.defaultFileDownloadRequestHandler,
       onGetRawStreamRequest: this.options.onGetRawStreamRequest || this.defaultGetRawStreamHandler,

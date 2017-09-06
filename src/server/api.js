@@ -76,6 +76,15 @@ export default class Api {
   }
 
   connectMiddlewares (app, middlewares) {
+    // If middlewares are provided, use them here
+    if (middlewares && Array.isArray(middlewares)) {
+      for (var i = 0; i < middlewares.length; i++) {
+        if (typeof middlewares[i] === 'function') {
+          app.use(middlewares[i])
+        }
+      }
+    }
+
     // Connect file upload and download middlewares
     FileUploadMiddleware(app, this.serverConfig, { uploadCallback: this.requestHandlers.onFileUploadRequest })
     app.get('/api/download/:id', this.requestHandlers.onFileDownloadRequest)
