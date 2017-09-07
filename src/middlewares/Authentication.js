@@ -1,5 +1,7 @@
 'use strict'
 
+import { getUserAccountDetails } from './UserAccountDetails'
+
 const Promise = require('bluebird')
 const jwt = require('jsonwebtoken')
 const constants = require('../lib/constants')
@@ -97,9 +99,13 @@ function validate (req, token, next) {
             }
           }
         }
+
+        return getUserAccountDetails(req.context.userAccountId).then((userDetails) => {
+          req.context.details = userDetails
+          next()
+          return null
+        })
       }
-      next()
-      return null
     })
     .catch(err => {
       if (err.name !== 'TokenExpiredError') {

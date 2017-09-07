@@ -4,7 +4,7 @@ import path from 'path'
 import cookieParser from 'cookie-parser'
 import compression from 'compression'
 import Api from './api'
-
+import { createCache } from '../utils/cache'
 import { createLogger, default as logger } from '../logger'
 import { createNotificationService } from '../notifications/notificationService'
 import { createSettingService } from '../hub/services/settingService'
@@ -27,7 +27,13 @@ const COOKIE_EXPIRY = 2147483647
   - migrationFilePath: path to migration.zip file
   - migrationReplacements: object with replacement values
   - middlewares [(req, res, next)...] in the order you want them run
-  - onInitialized: callback once server is initialized
+  - onInitialized: callback once server is initialized,
+  - cacheOptions: {
+      stdTTL: 60, <- default expiration time (in seconds)
+      checkperiod: 120, <- How often to check if values are expired (in seconds)
+      errorOnMissing: false, <- throw an error if value does not exist in cache
+      useClones: true <- clone or return original object
+  }
 */
 
 export default class Host {
@@ -38,6 +44,7 @@ export default class Host {
     this.onUnhandledException = options.onUnhandledException
 
     // Create logger and notification service
+    createCache(options.cacheOptions)
     createLogger(serverConfig)
     createNotificationService(serverConfig)
     createSettingService(serverConfig)
