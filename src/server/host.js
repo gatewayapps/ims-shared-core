@@ -101,7 +101,13 @@ export default class Host {
         hubPackageUpdate(this.serverConfig.hubUrl, this.serverConfig.secret, this.packageDef).then(() => {
           if (this.options.migrationFilePath) {
             uploadMigrationFile(this.options.migrationFilePath, this.serverConfig, this.options.migrationReplacements).then((result) => {
-              logger.info(result)
+              if (result.success) {
+                logger.info('Migration succeeded')
+                logger.info(JSON.stringify(result, null, 2))
+              } else {
+                logger.error('Migration failed')
+                logger.error(JSON.stringify(result, null, 2))
+              }
             })
           }
         }).catch(this.handleException)
