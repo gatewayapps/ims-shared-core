@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch'
 import Constants from '../lib/constants'
+import semver from 'semver'
 import jwt from 'jsonwebtoken'
 let accessTokens = {}
 let PackageInformation
@@ -18,30 +19,66 @@ export function createAuthenticatedRequestHeader (packageId, accessToken) {
   })
 }
 
+export function isPackageAvailable (packageId) {
+  return !!accessTokens[packageId]
+}
+
 export function prepareRequest (hubUrl, packageSecret, packageInformation) {
   PackageInformation = packageInformation
   if (PackageInformation.packageDependencies) {
-    return Promise.all(PackageInformation.packageDependencies.map((p) => {
+    const packageIds = Object.keys(PackageInformation.packageDependencies)
+    return Promise.all(packageIds.map((p) => {
       const url = combineUrlParts(hubUrl, `packages/${p}/authorize`)
       const headers = {
         [Constants.RequestHeaders.PackageSecret]: packageSecret,
         [Constants.RequestHeaders.PackageId]: PackageInformation.packageId
       }
       return request(url, { authenticate: false, headers }).then((response) => {
-        if (response.success) {
-          const packageInfo = jwt.decode(response.accessToken)
-          accessTokens[p] = {
-            url: packageInfo.targetPackage.url,
-            packageId: p,
-            accessToken: response.accessToken
-          }
-        } else {
-          console.error('Failed to get access token for package', response)
-        }
+        handlePackageResponse(p, PackageInformation.packageDependencies[p], response)
       })
     }))
   }
 }
+
+function handlePackageResponse (packageId, constraints, response) {
+  let verified = false
+  let packageInfo
+  if (response.success) {
+    console.log(response)
+    packageInfo = jwt.decode(response.accessToken)
+    console.log(packageInfo)
+    if (constraints.version) {
+      if (semver.satisfies(packageInfo.targetPackage.version, constraints.version)) {
+        verified = true
+      } else {
+        if (!constraints.required) {
+          console.warn(`An access token for ${packageId} was obtained, but the installed version: ${packageInfo.targetPackage.version}
+          does not match the requested version: ${constraints.version} and the package may not function as expected.`)
+          verified = true
+        } else {
+          console.error(`An access token for ${packageId} was obtained, but the installed version (${packageInfo.targetPackage.version}) did not match the requested version (${constraints.version}).`)
+        }
+      }
+    } else {
+      verified = true
+    }
+  }
+  if (verified) {
+    accessTokens[packageId] = {
+      url: packageInfo.targetPackage.url,
+      packageId:packageId,
+      accessToken: response.accessToken.accessToken,
+      version: packageInfo.targetPackage.version
+    }
+  } else {
+    if (constraints.required) {
+      throw new Error(`An access token for required package ${packageId} could not be obtained.  Please verify ${packageId} is installed.`)
+    } else {
+      console.log(`Optional package dependency ${packageId} is not installed.`)
+    }
+  }
+}
+
 export default function request (url, options) {
   try {
     verifyInitialized()

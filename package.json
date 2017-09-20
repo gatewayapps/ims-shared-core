@@ -41,6 +41,7 @@
     "mime-types": "^2.1.15",
     "mkdirp": "^0.5.1",
     "node-cache": "^4.1.1",
+    "semver": "^5.4.1",
     "sequelize": "^3.24.0",
     "socket.io-client": "^1.4.8",
     "swagger-express-mw": "^0.7.0",
