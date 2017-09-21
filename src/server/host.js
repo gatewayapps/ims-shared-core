@@ -118,8 +118,8 @@ export default class Host {
     })
   }
 
-  defaultBadgesRequestHandler (userContext) {
-    return Promise.resolve(0)
+  defaultBadgesRequestHandler (req, res, next) {
+    res.json({ success: false, reason: 'Not Implemented' })
   }
   defaultFileDownloadRequestHandler (req, res, next) {
     res.status(404).send()
