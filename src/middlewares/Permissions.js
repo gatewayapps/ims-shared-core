@@ -1,8 +1,8 @@
 'use strict'
 const PermissionHandler = require('../lib/PermissionHandler')
-const AuthenticationMiddleware = require('./Authentication')
+import createAuthenticationMiddleware from './Authentication'
 module.exports = (app, config) => {
-  const auth = AuthenticationMiddleware(config)
+  const auth = createAuthenticationMiddleware(config)
   const permissionHandler = new PermissionHandler({ package: { id: config.packageId } })
 
   app.get('/api/user/hasPermission/:permission/:nodeId?', auth.defaultMiddleware, (req, res) => {
