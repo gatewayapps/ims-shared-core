@@ -1,8 +1,11 @@
 import express from 'express'
 import SwaggerExpress from 'swagger-express-mw'
 import logger from '../logger'
+import constants from '../lib/constants'
 import createAuthenticationMiddleware from '../middlewares/Authentication'
 import FileUploadMiddleware from '../middlewares/FileUpload'
+import ContractMiddleware from '../middlewares/ContractMiddleware'
+import createBadgeMiddleware from '../middlewares/BadgeSignatureVerification'
 import ImageCache from '../middlewares/ImageCache'
 
 /* requestHandlers structure
@@ -13,11 +16,12 @@ import ImageCache from '../middlewares/ImageCache'
 */
 
 export default class Api {
-  constructor (serverConfig, swaggerConfig, middlewares, requestHandlers, onException) {
+  constructor (serverConfig, swaggerConfig, middlewares, requestHandlers, onException, contractsDirectory) {
     this.onException = onException
     this.requestHandlers = requestHandlers
     this.serverConfig = serverConfig
     this.middlewares = middlewares
+    this.contractsDirectory = contractsDirectory
 
     try {
       this.verifySwaggerConfig(swaggerConfig)
@@ -68,14 +72,14 @@ export default class Api {
       }
 
       const app = express()
-      this.connectMiddlewares(app, this.middlewares)
+      this.connectMiddlewares(app, this.middlewares, this.contractsDirectory)
 
       swaggerExpress.register(app)
       cb(null, app)
     })
   }
 
-  connectMiddlewares (app, middlewares) {
+  connectMiddlewares (app, middlewares, contractsDirectory) {
     // If middlewares are provided, use them here
     if (middlewares && Array.isArray(middlewares)) {
       for (var i = 0; i < middlewares.length; i++) {
@@ -88,6 +92,7 @@ export default class Api {
     // Connect file upload and download middlewares
     FileUploadMiddleware(app, this.serverConfig, { uploadCallback: this.requestHandlers.onFileUploadRequest })
     app.get('/api/download/:id', this.requestHandlers.onFileDownloadRequest)
+    app.get(constants.GlobalUrls.BadgeUrl, createBadgeMiddleware(this.serverConfig), this.requestHandlers.onBadgesRequest)
 
     app.get('/api/images/:id', ImageCache({
       cacheDir: this.serverConfig.cachePath,
@@ -111,6 +116,9 @@ export default class Api {
       })
       next()
     })
+    if (contractsDirectory) {
+      ContractMiddleware(app, this.serverConfig, contractsDirectory)
+    }
   }
 
   verifySwaggerConfig (swaggerConfig) {

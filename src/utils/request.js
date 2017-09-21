@@ -26,7 +26,9 @@ export function isPackageAvailable (packageId) {
 export function prepareRequest (hubUrl, packageSecret, packageInformation) {
   PackageInformation = packageInformation
   if (PackageInformation.packageDependencies) {
-    const packageIds = Object.keys(PackageInformation.packageDependencies)
+    const packageIds = Array.isArray(PackageInformation.packageDependencies)
+    ? PackageInformation.packageDependencies
+    : Object.keys(PackageInformation.packageDependencies)
     return Promise.all(packageIds.map((p) => {
       const url = combineUrlParts(hubUrl, `packages/${p}/authorize`)
       const headers = {
@@ -34,7 +36,10 @@ export function prepareRequest (hubUrl, packageSecret, packageInformation) {
         [Constants.RequestHeaders.PackageId]: PackageInformation.packageId
       }
       return request(url, { authenticate: false, headers }).then((response) => {
-        handlePackageResponse(p, PackageInformation.packageDependencies[p], response)
+        const constraints = Array.isArray(PackageInformation.packageDependencies)
+        ? { required: false }
+        : PackageInformation.packageDependencies[p]
+        handlePackageResponse(p, constraints, response)
       })
     }))
   }
@@ -44,9 +49,7 @@ function handlePackageResponse (packageId, constraints, response) {
   let verified = false
   let packageInfo
   if (response.success) {
-    console.log(response)
     packageInfo = jwt.decode(response.accessToken)
-    console.log(packageInfo)
     if (constraints.version) {
       if (semver.satisfies(packageInfo.targetPackage.version, constraints.version)) {
         verified = true
