@@ -1,10 +1,11 @@
 import express from 'express'
 import SwaggerExpress from 'swagger-express-mw'
 import logger from '../logger'
+import constants from '../lib/constants'
 import createAuthenticationMiddleware from '../middlewares/Authentication'
 import FileUploadMiddleware from '../middlewares/FileUpload'
 import ContractMiddleware from '../middlewares/ContractMiddleware'
-
+import createBadgeMiddleware from '../middlewares/BadgeSignatureVerification'
 /* requestHandlers structure
   - onFileUploadRequest : (req,res, fileDetails)
   - onFileDownloadRequest: (req, res, next)
@@ -88,6 +89,7 @@ export default class Api {
     // Connect file upload and download middlewares
     FileUploadMiddleware(app, this.serverConfig, { uploadCallback: this.requestHandlers.onFileUploadRequest })
     app.get('/api/download/:id', this.requestHandlers.onFileDownloadRequest)
+    app.get(constants.GlobalUrls.BadgeUrl, createBadgeMiddleware(this.serverConfig), this.requestHandlers.onBadgesRequest)
 
     // Send the swagger file if it's requested
     app.get('/swagger', (req, res) => {

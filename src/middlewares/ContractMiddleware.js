@@ -14,13 +14,13 @@ module.exports = (app, config, contractsPath) => {
         if (action) {
           action(req, res, next)
         } else {
-          res.status(404).send()
+          res.json({ success: false, reason: `Action not found on contract ${req.params.packageId}:${req.params.contract}` })
         }
       } else {
-        res.status(404).send()
+        res.json({ success: false, reason: `Contract not found for package ${req.params.packageId}` })
       }
     } else {
-      res.status(404).send()
+      res.json({ success: false, reason: `Contract definition not found for ${req.params.packageId}:${req.params.contract}:${req.params.action} ` })
     }
   })
 }

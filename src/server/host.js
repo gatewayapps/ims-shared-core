@@ -24,6 +24,7 @@ const COOKIE_EXPIRY = 2147483647
     configDir: relative path from appRoot to api/swagger
     swaggerFile: full path to swagger file
   }
+  - contractsDirectory: path to contracts folder that contains implementation for contracts
   - migrationFilePath: path to migration.zip file
   - migrationReplacements: object with replacement values
   - middlewares [(req, res, next)...] in the order you want them run
@@ -86,7 +87,7 @@ export default class Host {
       onFileUploadRequest : this.options.onFileUploadRequest,
       onFileDownloadRequest: this.options.onFileDownloadRequest || this.defaultFileDownloadRequestHandler,
       onBadgesRequest: this.options.onBadgesRequest || this.defaultBadgesRequestHandler
-    }, this.handleException)
+    }, this.handleException, this.options.contractsDirectory)
 
     api.createApp((err, apiApp) => {
       if (err) {

@@ -26,6 +26,9 @@ module.exports = {
   SocketEvents: {
     TreeModifiedEvent: '@HUB/TREE_MODIFIED'
   },
+  GlobalUrls: {
+    BadgeUrl: '/api/__badge'
+  },
   Cookies: {
     HubUrl: 'HUB_URL',
     InitialState: '__INITIAL_STATE__',
