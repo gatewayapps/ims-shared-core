@@ -1,3 +1,4 @@
+import logger from '../logger'
 import fetch from 'isomorphic-fetch'
 import Constants from '../lib/constants'
 import semver from 'semver'
@@ -26,6 +27,9 @@ export function isPackageAvailable (packageId) {
 export function prepareRequest (hubUrl, packageSecret, packageInformation) {
   PackageInformation = packageInformation
   if (PackageInformation.packageDependencies) {
+    if (Array.isArray(packageInformation.packageDependencies)) {
+      logger.warn('Providing package dependencies as an array of strings is deprecated.  Please move to the new object structure before upgrading to ims-shared-core>10.0.0')
+    }
     const packageIds = Array.isArray(PackageInformation.packageDependencies)
     ? PackageInformation.packageDependencies
     : Object.keys(PackageInformation.packageDependencies)
