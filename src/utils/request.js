@@ -74,7 +74,7 @@ function handlePackageResponse (packageId, constraints, response) {
     accessTokens[packageId] = {
       url: packageInfo.targetPackage.url,
       packageId:packageId,
-      accessToken: response.accessToken.accessToken,
+      accessToken: response.accessToken,
       version: packageInfo.targetPackage.version
     }
   } else {
@@ -134,6 +134,7 @@ function makeAuthenticatedRequest (url, requestOptions) {
     if (pkg) {
       const accessToken = getAccessTokenForPackage(pkg.packageId)
       requestOptions.headers = createAuthenticatedRequestHeader(requestOptions.packageId, accessToken)
+
       return makeRequest(combineUrlParts(pkg.url, url), requestOptions)
     } else {
       throw new Error(`Package ${requestOptions.packageId} was not found in ${accessTokens}  Make sure you have added the package to your packageDependencies`)
@@ -145,6 +146,8 @@ function makeUnauthenticatedRequest (url, requestOptions) {
 }
 
 function makeRequest (url, requestOptions) {
+  console.log('making request to ', url)
+  console.log('with options ', JSON.stringify(requestOptions, null, 2))
   return fetch(url, requestOptions).then(parseResponse)
 }
 export function parseResponse (response) {
