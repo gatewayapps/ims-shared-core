@@ -1,6 +1,7 @@
 import express from 'express'
 import moment from 'moment'
 import path from 'path'
+import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import compression from 'compression'
 import Api from './api'
@@ -73,7 +74,10 @@ export default class Host {
 
     app.use(cookieParser())
     app.use(compression())
-
+    const corsOptions = {
+      optionsSuccessStatus: 200
+    }
+    app.use(cors(corsOptions))
     if (process.env.NODE_ENV === 'development') {
       logger.info('In development mode, so adding middleware to add HUB_URL to cookies')
       app.use((req, res, next) => {
