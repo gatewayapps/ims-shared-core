@@ -105,6 +105,9 @@ function validate (req, token, next) {
           next()
           return null
         })
+      } else {
+        next()
+        return null
       }
     })
     .catch(err => {
