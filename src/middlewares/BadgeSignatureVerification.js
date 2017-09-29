@@ -40,7 +40,7 @@ function getUserClaims (userAccountId, packageId) {
     if (claims) {
       return claims
     } else {
-      return request('/api/packages/ims.packages.' + packageId + '/claims/1', { packageId: 'ims.core.administration' }).then((result) => {
+      return request('/api/packages/' + packageId + '/claims/1', { packageId: 'ims.core.administration' }).then((result) => {
         return cacheSet(`claims:${userAccountId}`, result.claims).then(() => {
           return result.claims
         })
