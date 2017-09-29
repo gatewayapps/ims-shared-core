@@ -16,7 +16,7 @@ export default function createBadgeMiddleware (config) {
       const hash = crypto.createHmac('sha256', config.secret).update(`userAccountId=${userAccountId}&ts=${ts}`).digest('hex')
       if (hash === sig) {
         return getUserAccountDetails(parseInt(userAccountId)).then((details) => {
-          return getUserClaims(userAccountId).then((claims) => {
+          return getUserClaims(userAccountId, config.packageId).then((claims) => {
             req.context = {
               permissions: permissionHelper.createPermissionsArrayFromStringsArray(claims),
               userAccountId: userAccountId,
@@ -35,12 +35,12 @@ export default function createBadgeMiddleware (config) {
   }
 }
 
-function getUserClaims (userAccountId) {
+function getUserClaims (userAccountId, packageId) {
   return (cacheGet(`claims:${userAccountId}`)).then((claims) => {
     if (claims) {
       return claims
     } else {
-      return request('/api/packages/ims.packages.training/claims/1', { packageId: 'ims.core.administration' }).then((result) => {
+      return request('/api/packages/ims.packages.' + packageId + '/claims/1', { packageId: 'ims.core.administration' }).then((result) => {
         return cacheSet(`claims:${userAccountId}`, result.claims).then(() => {
           return result.claims
         })
