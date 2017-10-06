@@ -1,65 +1,65 @@
-"use strict";
+'use strict'
 
-function TreeHelper() {
+function TreeHelper () {
   this.getAncestorsOf = function (nodeId) {
-    var parents = [];
+    var parents = []
 
-    var currNode = nodeId;
+    var currNode = nodeId
     do {
-      parents.unshift(currNode);
-      currNode = global.nodeParents[currNode.toString()];
+      parents.unshift(currNode)
+      currNode = global.nodeParents[currNode.toString()]
     }
-    while (currNode != undefined && currNode >= 0);
+    while (currNode !== undefined && currNode >= 0)
 
-    return parents;
+    return parents
   }
 
   this.isNodeDescendantOf = function (testParent, node) {
     // if global.nodeParents does not exist we cannot check for descendants
-    if (global.nodeParents !== undefined && typeof global.nodeParents !== 'object') {
-      return false;
+    if (global.nodeParents === undefined || typeof global.nodeParents !== 'object') {
+      return false
     }
 
-    if (node == '*') {
-      return true;
+    if (node === '*') {
+      return true
     }
 
     // if the node we are checking matches the parent we are checking it is a descendant
-    if (node == testParent) {
-      return true;
+    if (node === testParent) {
+      return true
     }
 
-    var currNode = node;
-    var isDescendant = false;
+    var currNode = node
+    var isDescendant = false
 
     do {
-      var parent = global.nodeParents[currNode.toString()];
-      if (parent == testParent) {
-        isDescendant = true;
+      var parent = global.nodeParents[currNode.toString()]
+      if (parent === testParent) {
+        isDescendant = true
       }
-      currNode = parent;
+      currNode = parent
     }
-    while (!isDescendant && currNode != undefined && currNode >= 0);
+    while (!isDescendant && currNode !== undefined && currNode >= 0)
 
-    return isDescendant;
+    return isDescendant
   }
 
   this.removeNodeParent = function (nodeId) {
     if (global.nodeParents && global.nodeParents[nodeId.toString()]) {
-      delete global.nodeParents[nodeId.toString()];
+      delete global.nodeParents[nodeId.toString()]
     }
   }
 
   this.setNodeParent = function (nodeId, parent) {
     if (!global.nodeParents) {
-      global.nodeParents = {};
+      global.nodeParents = {}
     }
-    global.nodeParents[nodeId.toString()] = parent;
+    global.nodeParents[nodeId.toString()] = parent
   }
 
   this.setNodeParents = function (nodeParents) {
-    global.nodeParents = nodeParents;
+    global.nodeParents = nodeParents
   }
 }
 
-module.exports = new TreeHelper();
+module.exports = new TreeHelper()
