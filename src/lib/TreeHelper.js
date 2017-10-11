@@ -15,11 +15,6 @@ function TreeHelper () {
   }
 
   this.isNodeDescendantOf = function (testParent, node) {
-    // if global.nodeParents does not exist we cannot check for descendants
-    if (global.nodeParents === undefined || typeof global.nodeParents !== 'object') {
-      return false
-    }
-
     if (node === '*') {
       return true
     }
@@ -27,6 +22,11 @@ function TreeHelper () {
     // if the node we are checking matches the parent we are checking it is a descendant
     if (node === testParent) {
       return true
+    }
+
+    // if global.nodeParents does not exist we cannot check for descendants
+    if ((global.nodeParents === undefined || typeof global.nodeParents !== 'object')) {
+      return false
     }
 
     var currNode = node
