@@ -1,6 +1,7 @@
 import express from 'express'
 import moment from 'moment'
 import path from 'path'
+const sockets = require('../sockets')
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import compression from 'compression'
@@ -106,6 +107,7 @@ export default class Host {
         this.options.onInitialized(null, app)
 
         hubPackageUpdate(this.serverConfig.hubUrl, this.serverConfig.secret, this.packageDef).then(() => {
+          sockets.use(this.serverConfig)
           if (this.options.migrationFilePath) {
             uploadMigrationFile(this.options.migrationFilePath, this.serverConfig, this.options.migrationReplacements).then((result) => {
               if (result.success) {
