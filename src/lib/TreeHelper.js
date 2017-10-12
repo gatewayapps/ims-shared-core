@@ -34,7 +34,7 @@ function TreeHelper () {
 
     do {
       var parent = global.nodeParents[currNode.toString()]
-      if (parent === testParent) {
+      if (parent.toString() === testParent) {
         isDescendant = true
       }
       currNode = parent
