@@ -25,7 +25,11 @@ module.exports = {
       console.log('Connected to ' + context.hubUrl)
       _this.emit('register', { package: context.packageId, contents: {} })
       if (!_this.options.disableTreeCache) {
-        hub.refreshParentNodes()
+        try {
+          hub.refreshParentNodes()
+        } catch (err) {
+          console.error(err)
+        }
       }
     })
 
@@ -37,7 +41,11 @@ module.exports = {
     })
     socket.on(constants.SocketEvents.TreeModifiedEvent, function (contents) {
       if (!_this.options.disableTreeCache) {
-        hub.refreshParentNodes()
+        try {
+          hub.refreshParentNodes()
+        } catch (err) {
+          console.error(err)
+        }
       }
     })
     socket.on('error', function (contents) {
