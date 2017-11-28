@@ -5,6 +5,7 @@ import constants from '../lib/constants'
 import createAuthenticationMiddleware from '../middlewares/Authentication'
 import FileUploadMiddleware from '../middlewares/FileUpload'
 import ContractMiddleware from '../middlewares/ContractMiddleware'
+import { ActivityMiddleware } from '../middlewares/Activities'
 import createBadgeMiddleware from '../middlewares/BadgeSignatureVerification'
 import ImageCache from '../middlewares/ImageCache'
 
@@ -16,12 +17,13 @@ import ImageCache from '../middlewares/ImageCache'
 */
 
 export default class Api {
-  constructor (serverConfig, swaggerConfig, middlewares, requestHandlers, onException, contractsDirectory) {
+  constructor (serverConfig, swaggerConfig, middlewares, requestHandlers, onException, contractsDirectory, activitiesDirectory) {
     this.onException = onException
     this.requestHandlers = requestHandlers
     this.serverConfig = serverConfig
     this.middlewares = middlewares
     this.contractsDirectory = contractsDirectory
+    this.activitiesDirectory = activitiesDirectory
 
     try {
       this.verifySwaggerConfig(swaggerConfig)
@@ -72,14 +74,14 @@ export default class Api {
       }
 
       const app = express()
-      this.connectMiddlewares(app, this.middlewares, this.contractsDirectory)
+      this.connectMiddlewares(app, this.middlewares, this.contractsDirectory, this.activitiesDirectory)
 
       swaggerExpress.register(app)
       cb(null, app)
     })
   }
 
-  connectMiddlewares (app, middlewares, contractsDirectory) {
+  connectMiddlewares (app, middlewares, contractsDirectory, activitiesDirectory) {
     // If middlewares are provided, use them here
     if (middlewares && Array.isArray(middlewares)) {
       for (var i = 0; i < middlewares.length; i++) {
@@ -118,6 +120,9 @@ export default class Api {
     })
     if (contractsDirectory) {
       ContractMiddleware(app, this.serverConfig, contractsDirectory)
+    }
+    if (activitiesDirectory) {
+      ActivityMiddleware(app, this.serverConfig, activitiesDirectory, this.serverConfig.mongoConnectionString)
     }
   }
 
