@@ -1,6 +1,6 @@
 {
   "name": "ims-shared-core",
-  "version": "9.4.11",
+  "version": "9.5.0",
   "description": "",
   "babel": {
     "presets": [
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/gatewayapps/ims-shared-core#readme",
   "dependencies": {
+    "args": "^3.0.7",
     "bluebird": "^3.4.3",
     "bunyan": "^1.8.5",
     "bunyan-debug-stream": "^1.0.7",

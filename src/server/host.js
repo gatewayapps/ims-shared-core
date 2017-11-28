@@ -94,7 +94,7 @@ export default class Host {
       onFileDownloadRequest: this.options.onFileDownloadRequest || this.defaultFileDownloadRequestHandler,
       onGetRawStreamRequest: this.options.onGetRawStreamRequest || this.defaultGetRawStreamHandler,
       onBadgesRequest: this.options.onBadgesRequest || this.defaultBadgesRequestHandler
-    }, this.handleException, this.options.contractsDirectory)
+    }, this.handleException, this.options.contractsDirectory, this.options.activitiesDirectory)
 
     api.createApp((err, apiApp) => {
       if (err) {
