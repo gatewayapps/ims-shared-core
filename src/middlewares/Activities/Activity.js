@@ -140,7 +140,10 @@ export default class Activity {
     }
   }
   getInputValue (name) {
-    const val = this.activity.inputs[name]
+    let val = this.activity.inputs[name]
+    if (val.trim) {
+      val = val.trim()
+    }
     // Find ${binding.path}
     const regex = /\$\{([^}]+)\}/g
     let match = regex.exec(val)
@@ -148,7 +151,11 @@ export default class Activity {
       const bindingText = match[1]
       const bindingPathArray = bindingText.split('.')
       const boundValue = this.getBindingValue(bindingPathArray, this.context)
-      return boundValue
+      if (match[0].length === val.length) {
+        return boundValue
+      } else {
+        return val.replace(match[0], boundValue)
+      }
     } else {
       return val
     }
