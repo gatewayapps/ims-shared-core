@@ -141,18 +141,20 @@ export default class Activity {
   }
   getInputValue (name) {
     let val = this.activity.inputs[name]
-    if (val.trim) {
-      val = val.trim()
-    }
+    if (val) {
+      if (val.trim) {
+        val = val.trim()
+      }
     // Find ${binding.path}
-    const regex = /\$\{([^}]+)\}/g
-    let match = regex.exec(val)
-    while (match && match.length > 1) {
-      const bindingText = match[1]
-      const bindingPathArray = bindingText.split('.')
-      const boundValue = this.getBindingValue(bindingPathArray, this.context)
-      val = val.replace(match[0], boundValue)
-      match = regex.exec(val)
+      const regex = /\$\{([^}]+)\}/g
+      let match = regex.exec(val)
+      while (match && match.length > 1) {
+        const bindingText = match[1]
+        const bindingPathArray = bindingText.split('.')
+        const boundValue = this.getBindingValue(bindingPathArray, this.context)
+        val = val.replace(match[0], boundValue)
+        match = regex.exec(val)
+      }
     }
     return val
   }
