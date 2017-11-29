@@ -147,18 +147,14 @@ export default class Activity {
     // Find ${binding.path}
     const regex = /\$\{([^}]+)\}/g
     let match = regex.exec(val)
-    if (match && match.length > 1) {
+    while (match && match.length > 1) {
       const bindingText = match[1]
       const bindingPathArray = bindingText.split('.')
       const boundValue = this.getBindingValue(bindingPathArray, this.context)
-      if (match[0].length === val.length) {
-        return boundValue
-      } else {
-        return val.replace(match[0], boundValue)
-      }
-    } else {
-      return val
+      val = val.replace(match[0], boundValue)
+      match = regex.exec(val)
     }
+    return val
   }
 
   getBindingValue (pathArray, obj) {
