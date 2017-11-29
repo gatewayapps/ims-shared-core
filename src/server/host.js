@@ -10,7 +10,7 @@ import { createCache } from '../utils/cache'
 import { createLogger, default as logger } from '../logger'
 import { createNotificationService } from '../notifications/notificationService'
 import { createSettingService } from '../hub/services/settingService'
-import { hubPackageUpdate, uploadMigrationFile, prepareRequest } from '../utils'
+import { hubPackageUpdate, uploadMigrationFile, prepareRequest, prepareEventPublisher } from '../utils'
 import Constants from '../lib/constants'
 
 const COOKIE_EXPIRY = 2147483647
@@ -53,6 +53,7 @@ export default class Host {
     createNotificationService(serverConfig)
     createSettingService(serverConfig)
     prepareRequest(this.serverConfig.hubUrl, this.serverConfig.secret, packageDef)
+    prepareEventPublisher(this.serverConfig.mongoConnectionString, this.serverConfig.hubUrl, packageDef.packageId)
 
     // wire up exception handling
     process.on('uncaughtException', this.handleException)
