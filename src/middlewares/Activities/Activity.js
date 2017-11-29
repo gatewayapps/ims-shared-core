@@ -188,7 +188,9 @@ export default class Activity {
     this.complete = true
     this.success = true
     this.result = { value, data }
-    return this.save().then(() => this.callback)
+    return this.save().then(() => {
+      return this.callback()
+    })
   }
 
   fail (reason) {
@@ -199,6 +201,8 @@ export default class Activity {
     this.complete = true
     this.success = false
     this.reason = reason
-    return this.save().then(() => this.callback)
+    return this.save().then(() => {
+      return this.callback()
+    })
   }
 }
