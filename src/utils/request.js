@@ -106,7 +106,7 @@ function verifyInitialized () {
   return (PackageInformation && PackageInformation.packageId)
 }
 
-function combineUrlParts (base, endpoint) {
+export function combineUrlParts (base, endpoint) {
   if (endpoint.indexOf('/') !== 0) {
     endpoint = '/' + endpoint
   }
