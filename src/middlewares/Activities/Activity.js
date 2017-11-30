@@ -35,6 +35,21 @@ export default class Activity {
     })
   }
 
+  static LoadCompletedActivitiesForTask (db, taskId) {
+    return new Promise((resolve, reject) => {
+      db.collection('TaskActivities').find({
+        'context.taskId': taskId,
+        complete: true
+      }, (err, results) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(results)
+        }
+      })
+    })
+  }
+
   static LoadActivityAsync (id, activitiesPath, db) {
     return new Promise((resolve, reject) => {
       db.collection('TaskActivities').findOne({
@@ -44,16 +59,26 @@ export default class Activity {
           console.error(err)
           reject(err)
         } else {
-          const name = result.activity.id
-          const ClassType = this.LoadActivityDefinition(activitiesPath, name)
-          const act = new ClassType(result.context, result.activity, db)
-          act.result = result.result
-          act.auccess = result.success
-          act.reason = result.reason
-          act.dateCreated = result.dateCreated
-          act.complete = result.complete
-          act.id = mongojs.ObjectId(id)
-          resolve(act)
+          return Activity.LoadCompletedActivitiesForTask(db, id).then((results) => {
+            const name = result.activity.id
+            const ClassType = this.LoadActivityDefinition(activitiesPath, name)
+
+            result.context.steps = {}
+            results.map((r) => {
+              result.context.steps[r.context.step] = r.result
+            })
+
+            const act = new ClassType(result.context, result.activity, db)
+            act.result = result.result
+            act.auccess = result.success
+            act.reason = result.reason
+            act.dateCreated = result.dateCreated
+            act.complete = result.complete
+            act.id = mongojs.ObjectId(id)
+
+            console.log('LOADED ACTIVITY', act)
+            resolve(act)
+          })
         }
       })
     })
