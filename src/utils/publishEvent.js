@@ -1,3 +1,4 @@
+import fetch from 'isomorphic-fetch'
 import { default as request, combineUrlParts } from './request'
 import mongojs from 'mongojs'
 
@@ -27,14 +28,18 @@ export default function publishEvent (eventType, payload) {
         ev: EVENT_VERSION,
         created: new Date()
       }
-      console.log('Publishing event', e)
+
       mongoClient.collection('PackageEvents').insert(e, (err, result) => {
         if (err) {
           reject(err)
         } else {
-          console.log('event published', result)
           const url = combineUrlParts(HUB_URL, `/api/core/events/${result._id}`)
-          request(url, { method:'POST', authenticate: false })
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
           resolve(true)
         }
       })
