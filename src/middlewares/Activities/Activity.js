@@ -170,7 +170,7 @@ export default class Activity {
       let key = pathArray[i]
       let numberKey = Number(pathArray[i])
 
-      currentObj = currentObj[key] || currentObj[numberKey]
+      currentObj = currentObj[key] !== undefined ? currentObj[key] : currentObj[numberKey]
 
       if (!currentObj) {
         break
