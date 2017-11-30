@@ -59,7 +59,7 @@ export default class Activity {
           console.error(err)
           reject(err)
         } else {
-          return Activity.LoadCompletedActivitiesForTask(db, id).then((results) => {
+          return Activity.LoadCompletedActivitiesForTask(db, result.context.taskId).then((results) => {
             const name = result.activity.id
             const ClassType = this.LoadActivityDefinition(activitiesPath, name)
 
@@ -75,8 +75,6 @@ export default class Activity {
             act.dateCreated = result.dateCreated
             act.complete = result.complete
             act.id = mongojs.ObjectId(id)
-
-            console.log('LOADED ACTIVITY', act)
             resolve(act)
           })
         }
