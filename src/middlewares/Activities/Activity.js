@@ -102,6 +102,7 @@ export default class Activity {
   }
 
   callback () {
+    console.log('in Activity.callback')
     if (this.context.callback) {
       const body = {
         context: {
@@ -116,6 +117,8 @@ export default class Activity {
           'Content-Type': 'application/json'
         }
       })
+    } else {
+      return Promise.resolve()
     }
   }
 
