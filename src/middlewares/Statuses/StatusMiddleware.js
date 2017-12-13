@@ -2,7 +2,7 @@ import du from 'du'
 
 export default function StatusMiddleware (app, config) {
   app.use('/api/core/status', (req, res, next) => {
-    du(config.FILE_STORAGE_PATH, (err, sizeInBytes) => {
+    du(config.fileStoragePath, (err, sizeInBytes) => {
       if (err) {
         res.json({
           success: false,
