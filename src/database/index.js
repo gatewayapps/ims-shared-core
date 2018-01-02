@@ -1,21 +1,26 @@
-const Sequelize = require('sequelize');
+const Sequelize = require('sequelize')
 
-var instances = {};
+var instances = {}
 
 module.exports = (config, databaseNameOverride) => {
   // Support for automatic transactions
-  if(config.cls){
+  if (config.cls) {
     Sequelize.cls = config.cls
   }
 
+  // Do not specify MSSQLSERVER as an instance name
+  // MSSQLSERVER will not work as an instance name on Linux.
+  if (config.instanceName && config.instanceName.toUpperCase() === 'MSSQLSERVER') {
+    delete config.instanceName
+  }
 
-  var dbName = databaseNameOverride || config.databaseName;
+  var dbName = databaseNameOverride || config.databaseName
   if (!instances[dbName]) {
     var logging = process.env.NODE_ENV === 'development' ? console.log : false
-    if(config.logging === false){
+    if (config.logging === false) {
       logging = false
     }
-    
+
     if (logging) {
       console.log(`Connecting to ${dbName}`)
     }
@@ -42,15 +47,14 @@ module.exports = (config, databaseNameOverride) => {
           timestamps: false
         },
         logging: logging
-      });
+      })
     instances[dbName].authenticate().then(() => {
-      if(logging){
+      if (logging) {
         console.log(`${dbName} connected`)
       }
-      }).catch((err)=>{
-        console.error(err)
-      })
-    }
-    return instances[dbName];
+    }).catch((err) => {
+      console.error(err)
+    })
+  }
+  return instances[dbName]
 }
-
