@@ -76,12 +76,13 @@ function getDescendantUserAccounts (db, nodes, options) {
 }
 
 function getParentsObject (db) {
-  return db.Node.findAll({
-    attributes: [
-      'nodeId',
-      'parent'
-    ]
-  })
+  if (db) {
+    return db.Node.findAll({
+      attributes: [
+        'nodeId',
+        'parent'
+      ]
+    })
     .then(nodes => {
       const parentObj = {}
 
@@ -91,6 +92,9 @@ function getParentsObject (db) {
 
       return parentObj
     })
+  } else {
+    return undefined
+  }
 }
 
 function getStructuredTree (db, treeNameOrId) {
