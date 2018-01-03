@@ -52,7 +52,6 @@ export default class Host {
     createLogger(serverConfig)
     createNotificationService(serverConfig)
     createSettingService(serverConfig)
-    prepareRequest(this.serverConfig.hubUrl, this.serverConfig.secret, packageDef)
     prepareEventPublisher(this.serverConfig.mongoConnectionString, this.serverConfig.hubUrl, packageDef.packageId)
 
     // wire up exception handling
@@ -108,6 +107,7 @@ export default class Host {
         this.options.onInitialized(null, app)
 
         hubPackageUpdate(this.serverConfig.hubUrl, this.serverConfig.secret, this.packageDef).then(() => {
+          prepareRequest(this.serverConfig.hubUrl, this.serverConfig.secret, this.packageDef)
           sockets.use(this.serverConfig)
           if (this.options.migrationFilePath) {
             uploadMigrationFile(this.options.migrationFilePath, this.serverConfig, this.options.migrationReplacements).then((result) => {
