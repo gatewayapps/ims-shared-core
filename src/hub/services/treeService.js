@@ -93,7 +93,7 @@ function getParentsObject (db) {
       return parentObj
     })
   } else {
-    return undefined
+    return Promise.resolve(undefined)
   }
 }
 
