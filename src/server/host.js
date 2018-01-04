@@ -1,6 +1,7 @@
 import express from 'express'
 import moment from 'moment'
 import path from 'path'
+import { scheduleTasks } from '../utils/taskScheduler'
 const sockets = require('../sockets')
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
@@ -53,7 +54,7 @@ export default class Host {
     createNotificationService(serverConfig)
     createSettingService(serverConfig)
     prepareEventPublisher(this.serverConfig.mongoConnectionString, this.serverConfig.hubUrl, packageDef.packageId)
-
+    scheduleTasks(packageDef.tasks)
     // wire up exception handling
     process.on('uncaughtException', this.handleException)
 
