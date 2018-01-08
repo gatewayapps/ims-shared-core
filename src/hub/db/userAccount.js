@@ -79,6 +79,10 @@ module.exports = (Sequelize, dbContext) => {
       type: Sequelize.DATE,
       allowNull: false,
       defaultValue: Sequelize.NOW
+    },
+    userStatusId: {
+      type: Sequelize.INTEGER,
+      allowNull: true
     }
   }, {
     tableName: 'UserAccounts',
