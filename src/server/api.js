@@ -4,6 +4,7 @@ import logger from '../logger'
 import constants from '../lib/constants'
 import createAuthenticationMiddleware from '../middlewares/Authentication'
 import FileUploadMiddleware from '../middlewares/FileUpload'
+import PermissionCheckMiddleware from '../middlewares/Permissions'
 import ContractMiddleware from '../middlewares/ContractMiddleware'
 import { ActivityMiddleware } from '../middlewares/Activities'
 import { StatusMiddleware } from '../middlewares/Statuses'
@@ -94,6 +95,7 @@ export default class Api {
 
     // Connect file upload and download middlewares
     FileUploadMiddleware(app, this.serverConfig, { uploadCallback: this.requestHandlers.onFileUploadRequest })
+    PermissionCheckMiddleware(app, this.serverConfig)
     app.get('/api/download/:id', this.requestHandlers.onFileDownloadRequest)
     app.get(constants.GlobalUrls.BadgeUrl, createBadgeMiddleware(this.serverConfig), this.requestHandlers.onBadgesRequest)
 
