@@ -87,10 +87,19 @@ export default class Api {
     // If middlewares are provided, use them here
     if (middlewares && Array.isArray(middlewares)) {
       for (var i = 0; i < middlewares.length; i++) {
-        if (typeof middlewares[i] === 'function') {
+        if (middlewares[i].route && middlewares[i].handler && middlewares[i].method) {
+          const method = middlewares[i].method
+          if (method === 'GET') {
+            app.get(middlewares[i].route, middlewares[i].handler)
+          } else if (method === 'POST') {
+            app.post(middlewares[i].route, middlewares[i].handler)
+          } else if (method === 'DELETE') {
+            app.delete(middlewares[i].route, middlewares[i].handler)
+          } else if (method === 'PUT') {
+            app.put(middlewares[i].route, middlewares[i].handler)
+          }
+        } else if (typeof middlewares[i] === 'function') {
           app.use(middlewares[i])
-        } else if (middlewares[i].route && middlewares[i].handler) {
-          app.use(middlewares[i].route, middlewares[i].handler)
         }
       }
     }
