@@ -89,13 +89,14 @@ export default class Api {
       for (var i = 0; i < middlewares.length; i++) {
         if (typeof middlewares[i] === 'function') {
           app.use(middlewares[i])
+        } else if (middlewares[i].route && middlewares[i].handler) {
+          app.use(middlewares[i].route, middlewares[i].handler)
         }
       }
     }
 
     // Connect file upload and download middlewares
     FileUploadMiddleware(app, this.serverConfig, { uploadCallback: this.requestHandlers.onFileUploadRequest })
-    PermissionCheckMiddleware(app, this.serverConfig)
     app.get('/api/download/:id', this.requestHandlers.onFileDownloadRequest)
     app.get(constants.GlobalUrls.BadgeUrl, createBadgeMiddleware(this.serverConfig), this.requestHandlers.onBadgesRequest)
 
@@ -121,6 +122,7 @@ export default class Api {
       })
       next()
     })
+    PermissionCheckMiddleware(app, this.serverConfig)
     if (contractsDirectory) {
       ContractMiddleware(app, this.serverConfig, contractsDirectory)
     }

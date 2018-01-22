@@ -22,7 +22,6 @@ module.exports = {
     socket = io(context.hubUrl)
 
     socket.on('connect', function (ev) {
-      console.log('Connected to ' + context.hubUrl)
       _this.emit('register', { package: context.packageId, contents: {} })
       if (!_this.options.disableTreeCache) {
         try {
