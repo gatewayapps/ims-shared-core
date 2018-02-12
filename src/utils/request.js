@@ -78,7 +78,7 @@ function handlePackageResponse (packageId, constraints, response) {
       version: packageInfo.targetPackage.version
     }
   } else {
-    if (constraints.required) {
+    if (constraints.required === true) {
       throw new Error(`An access token for required package ${packageId} could not be obtained.  Please verify ${packageId} is installed.`)
     } else {
       console.log(`Optional package dependency ${packageId} is not installed.`)
