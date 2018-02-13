@@ -24,6 +24,14 @@ export function isPackageAvailable (packageId) {
   return !!accessTokens[packageId]
 }
 
+export function getPackageUrl (packageId) {
+  if (isPackageAvailable(packageId)) {
+    return accessTokens[packageId].url
+  } else {
+    return undefined
+  }
+}
+
 export function prepareRequest (hubUrl, packageSecret, packageInformation) {
   PackageInformation = packageInformation
   if (PackageInformation.packageDependencies) {
