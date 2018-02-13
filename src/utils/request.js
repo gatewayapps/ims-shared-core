@@ -1,4 +1,3 @@
-import logger from '../logger'
 import fetch from 'isomorphic-fetch'
 import Constants from '../lib/constants'
 import semver from 'semver'
@@ -47,7 +46,7 @@ export function prepareRequest (hubUrl, packageSecret, packageInformation) {
     ? PackageInformation.packageDependencies
     : Object.keys(PackageInformation.packageDependencies)
 
-    if (!packageIds.find(packageInformation.packageId)) {
+    if (!packageIds.find((p) => p.packageId === packageInformation.packageId)) {
       packageIds.push(packageInformation.packageId)
     }
 
