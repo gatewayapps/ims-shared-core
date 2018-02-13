@@ -37,10 +37,20 @@ export function prepareRequest (hubUrl, packageSecret, packageInformation) {
   if (PackageInformation.packageDependencies) {
     if (Array.isArray(packageInformation.packageDependencies)) {
       console.warn('Providing package dependencies as an array of strings is deprecated.  Please move to the new object structure before upgrading to ims-shared-core>10.0.0')
+    } else {
+      if (!PackageInformation.packageDependencies[packageInformation.packageId]) {
+        PackageInformation.packageDependencies[packageInformation.packageId] = { required: true }
+      }
     }
+
     const packageIds = Array.isArray(PackageInformation.packageDependencies)
     ? PackageInformation.packageDependencies
     : Object.keys(PackageInformation.packageDependencies)
+
+    if (!packageIds.find(packageInformation.packageId)) {
+      packageIds.push(packageInformation.packageId)
+    }
+
     return Promise.all(packageIds.map((p) => {
       const url = combineUrlParts(hubUrl, `packages/${p}/authorize`)
       const headers = {
