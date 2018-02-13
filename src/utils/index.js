@@ -1,6 +1,6 @@
 import createSignature from './createSignature'
 import hubPackageUpdate from './hubPackageUpdate'
-import { default as request, prepareRequest, combineUrlParts } from './request'
+import { default as request, prepareRequest, combineUrlParts, getPackageUrl, isPackageAvailable } from './request'
 import uploadMigrationFile from './publishMigrations'
 import { scheduleTasks } from './taskScheduler'
 import { createCache } from './cache'
@@ -14,6 +14,8 @@ module.exports = {
   scheduleTasks,
   prepareRequest,
   combineUrlParts,
+  getPackageUrl,
+  isPackageAvailable,
   createCache,
   publishEvent,
   prepareEventPublisher
