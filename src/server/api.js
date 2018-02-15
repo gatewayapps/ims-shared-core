@@ -165,12 +165,12 @@ export default class Api {
   }
 }
 
-function getAbsolutePath (path, serverRoot) {
-  if (!path.isAbsolute(path)) {
+function getAbsolutePath (dir, serverRoot) {
+  if (!path.isAbsolute(dir)) {
     if (!serverRoot) {
       return undefined
     } else {
-      const result = path.resolve(path.join(serverRoot, path))
+      const result = path.resolve(dir.join(serverRoot, dir))
       if (path.isAbsolute(result)) {
         return result
       } else {
@@ -178,5 +178,5 @@ function getAbsolutePath (path, serverRoot) {
       }
     }
   }
-  return path
+  return dir
 }
