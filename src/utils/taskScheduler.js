@@ -11,9 +11,8 @@ export function scheduleTasks (tasks, serverRoot) {
       logger.info(`Starting Task: ${t.name}`)
 
       const modulePath = path.join(serverRoot, t.modulePath)
-      if (!fs.existsSync(modulePath)) {
-        logger.warn(`Task ${t.name} could not be started because ${modulePath} does not exist`)
-      } else {
+
+      try {
         logger.info(`Task ${t.name} module path: ${modulePath}, CWD: ${serverRoot}`)
         const cp = childProcess.fork(modulePath, [], { cwd: serverRoot, stdio: 'inherit' })
         cp.on('exit', (code, signal) => {
@@ -27,6 +26,8 @@ export function scheduleTasks (tasks, serverRoot) {
             }
           }
         })
+      } catch (err) {
+        logger.warn(`Task ${t.name} failed to start with this error`, err)
       }
     })
   })
