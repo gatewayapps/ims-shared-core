@@ -170,7 +170,7 @@ function getAbsolutePath (dir, serverRoot) {
     if (!serverRoot) {
       return undefined
     } else {
-      const result = path.resolve(dir.join(serverRoot, dir))
+      const result = path.resolve(path.join(serverRoot, dir))
       if (path.isAbsolute(result)) {
         return result
       } else {
