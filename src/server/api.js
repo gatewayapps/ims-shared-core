@@ -1,3 +1,5 @@
+import path from 'path'
+import fs from 'fs'
 import express from 'express'
 import SwaggerExpress from 'swagger-express-mw'
 import logger from '../logger'
@@ -19,7 +21,7 @@ import ImageCache from '../middlewares/ImageCache'
 */
 
 export default class Api {
-  constructor (serverConfig, swaggerConfig, middlewares, requestHandlers, onException, contractsDirectory, activitiesDirectory) {
+  constructor (serverConfig, swaggerConfig, middlewares, requestHandlers, onException, contractsDirectory = './api/contracts', activitiesDirectory = './api/activities') {
     this.onException = onException
     this.requestHandlers = requestHandlers
     this.serverConfig = serverConfig
@@ -132,10 +134,15 @@ export default class Api {
       next()
     })
     PermissionCheckMiddleware(app, this.serverConfig)
-    if (contractsDirectory) {
+
+    contractsDirectory = getAbsolutePath(contractsDirectory, this.serverConfig.serverRoot)
+    activitiesDirectory = getAbsolutePath(activitiesDirectory, this.serverConfig.serverRoot)
+
+    if (contractsDirectory && fs.existsSync(contractsDirectory)) {
       ContractMiddleware(app, this.serverConfig, contractsDirectory)
     }
-    if (activitiesDirectory) {
+
+    if (activitiesDirectory && fs.existsSync(activitiesDirectory)) {
       ActivityMiddleware(app, this.serverConfig, activitiesDirectory, this.serverConfig.mongoConnectionString)
     }
 
@@ -156,4 +163,20 @@ export default class Api {
       throw new Error('swaggerConfig.swaggerFile cannot be undefined or empty')
     }
   }
+}
+
+function getAbsolutePath (path, serverRoot) {
+  if (!path.isAbsolute(path)) {
+    if (!serverRoot) {
+      return undefined
+    } else {
+      const result = path.resolve(path.join(serverRoot, path))
+      if (path.isAbsolute(result)) {
+        return result
+      } else {
+        return undefined
+      }
+    }
+  }
+  return path
 }

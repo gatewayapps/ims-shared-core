@@ -21,6 +21,9 @@ var loggerWrapper = {
   },
   url: (...args) => {
     loggerInstance.url(...args)
+  },
+  warn: (...args) => {
+    loggerInstance.warn(...args)
   }
 }
 
@@ -77,7 +80,6 @@ export function createLogger (config, subFileName) {
     if (req.body) {
       loggerInstance.info(`[REQUEST BODY]`, req.body)
     }
-
   }
 
   loggerInstance.url = (message) => {

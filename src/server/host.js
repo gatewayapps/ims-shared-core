@@ -54,7 +54,11 @@ export default class Host {
     createNotificationService(serverConfig)
     createSettingService(serverConfig)
     prepareEventPublisher(this.serverConfig.mongoConnectionString, this.serverConfig.hubUrl, packageDef.packageId)
-    scheduleTasks(packageDef.tasks)
+
+    // To handle packages that don't provide serverRoot in serverConfig
+    const oldProcessCWD = path.join(process.cwd(), 'dist/server')
+
+    scheduleTasks(packageDef.tasks, serverConfig.serverRoot || oldProcessCWD)
     // wire up exception handling
     process.on('uncaughtException', this.handleException)
 
