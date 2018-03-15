@@ -141,9 +141,6 @@ export default class Host {
   }
 
   processAuthenticationRequest (req, res, next) {
-    if (req.query.refreshToken) {
-      res.cookie(Constants.Cookies.RefreshToken, req.query.refreshToken, { expires: moment().add(30, 'days').toDate() })
-    }
     res.redirect(req.query.return || '/')
     res.send()
   }
