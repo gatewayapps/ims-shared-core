@@ -114,7 +114,7 @@ function getTreeNodes (db, treeId) {
     where: {
       treeId: treeId
     },
-    attributes: [ 'nodeId', 'name', 'nodeDetailTypeId', 'treeId', 'parent', 'rank' ],
+    attributes: [ 'nodeId', 'name', 'nodeDetailTypeId', 'treeId', 'parent', 'rank', 'locationCode' ],
     include: [
       {
         model: db.NodeType,
