@@ -55,6 +55,10 @@ module.exports = (Sequelize, dbContext) => {
       allowNull: false,
       defaultValue: Sequelize.NOW,
     },
+    locationCode: {
+      type: Sequelize.STRING,
+      allowNull: true
+    }
   }, {
     tableName: 'Nodes',
     defaultScope: {
