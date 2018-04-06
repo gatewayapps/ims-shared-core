@@ -9,7 +9,6 @@ import FileUploadMiddleware from '../middlewares/FileUpload'
 import PermissionCheckMiddleware from '../middlewares/Permissions'
 import ContractMiddleware from '../middlewares/ContractMiddleware'
 import { ActivityMiddleware } from '../middlewares/Activities'
-import { StatusMiddleware } from '../middlewares/Statuses'
 import createBadgeMiddleware from '../middlewares/BadgeSignatureVerification'
 import ImageCache from '../middlewares/ImageCache'
 
@@ -145,8 +144,6 @@ export default class Api {
     if (activitiesDirectory && fs.existsSync(activitiesDirectory)) {
       ActivityMiddleware(app, this.serverConfig, activitiesDirectory, this.serverConfig.mongoConnectionString)
     }
-
-    StatusMiddleware(app, this.serverConfig)
   }
 
   verifySwaggerConfig (swaggerConfig) {

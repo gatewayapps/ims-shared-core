@@ -1,5 +1,4 @@
 import express from 'express'
-import moment from 'moment'
 import path from 'path'
 import { scheduleTasks } from '../utils/taskScheduler'
 const sockets = require('../sockets')
@@ -8,11 +7,11 @@ import cookieParser from 'cookie-parser'
 import compression from 'compression'
 import Api from './api'
 import { createCache } from '../utils/cache'
+import { prepareSocketService } from '../utils/socketService'
 import { createLogger, default as logger } from '../logger'
 import { createNotificationService } from '../notifications/notificationService'
 import { createSettingService } from '../hub/services/settingService'
 import { hubPackageUpdate, uploadMigrationFile, prepareRequest, prepareEventPublisher } from '../utils'
-import Constants from '../lib/constants'
 
 const COOKIE_EXPIRY = 2147483647
 
@@ -54,6 +53,7 @@ export default class Host {
     createNotificationService(serverConfig)
     createSettingService(serverConfig)
     prepareEventPublisher(this.serverConfig.mongoConnectionString, this.serverConfig.hubUrl, packageDef.packageId)
+    prepareSocketService(packageDef.packageId, serverConfig)
 
     // To handle packages that don't provide serverRoot in serverConfig
     const oldProcessCWD = path.join(process.cwd(), 'dist/server')
