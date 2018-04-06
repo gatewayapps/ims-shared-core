@@ -5,6 +5,7 @@ import uploadMigrationFile from './publishMigrations'
 import { scheduleTasks } from './taskScheduler'
 import { createCache } from './cache'
 import { default as publishEvent, prepareEventPublisher } from './publishEvent'
+import { prepareSocketService } from './socketService'
 
 module.exports = {
   createSignature,
@@ -18,5 +19,6 @@ module.exports = {
   isPackageAvailable,
   createCache,
   publishEvent,
-  prepareEventPublisher
+  prepareEventPublisher,
+  prepareSocketService
 }
