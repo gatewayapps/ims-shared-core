@@ -88,9 +88,20 @@ export function createLogger (config, subFileName) {
 }
 
 function fullUrl (req) {
-  return url.format({
-    protocol: req.protocol,
-    hostname: req.get('Host').toString().replace('[', '').replace(']', ''),
-    pathname: req.originalUrl
-  })
+  try {
+    if (req.get) {
+      return url.format({
+        protocol: req.protocol,
+        hostname: req.get('Host').toString().replace('[', '').replace(']', ''),
+        pathname: req.originalUrl
+      })
+    } else {
+      return url.format({
+        protocol: req.protocol,
+        pathname: req.originalUrl
+      })
+    }
+  } catch (err) {
+
+  }
 }
