@@ -2,7 +2,7 @@
 const url = require('url')
 const bunyan = require('bunyan')
 const path = require('path')
-const fs = require('fs')
+const fs = require('fs-extra')
 const bunyanDebugStream = require('bunyan-debug-stream')
 var loggerInstance // singleton
 
@@ -24,6 +24,9 @@ var loggerWrapper = {
   },
   warn: (...args) => {
     loggerInstance.warn(...args)
+  },
+  trace: (...args) => {
+    loggerInstance.trace(...args)
   }
 }
 
@@ -36,11 +39,8 @@ export function isLoggerCreated () {
 export function createLogger (config, subFileName) {
   const logPath = path.join(config.fileStoragePath, 'logs')
 
-  try {
-    fs.statSync(logPath)
-  } catch (e) {
-    fs.mkdirSync(logPath)
-  }
+  // Make sure paths are built
+  fs.ensureDirSync(logPath)
 
   const DEBUG_STREAMS = [{
     level: 'debug',
