@@ -142,6 +142,7 @@ function getAccessTokenForPackage (packageId) {
     return pkg.accessToken
   } else {
     console.error('Package not present in accessTokens', accessTokens)
+    return undefined
   }
 }
 
@@ -154,7 +155,8 @@ function makeAuthenticatedRequest (url, requestOptions) {
 
       return makeRequest(combineUrlParts(pkg.url, url), requestOptions)
     } else {
-      throw new Error(`Package ${requestOptions.packageId} was not found in ${accessTokens}  Make sure you have added the package to your packageDependencies`)
+      return Promise.resolve({ success: false, message: `An access token could not be obtained for ${requestOptions.packageId}` })
+      // throw new Error(`Package ${requestOptions.packageId} was not found in ${accessTokens}  Make sure you have added the package to your packageDependencies`)
     }
   }
 }
@@ -163,8 +165,6 @@ function makeUnauthenticatedRequest (url, requestOptions) {
 }
 
 function makeRequest (url, requestOptions) {
-  console.log('making request to ', url)
-  console.log('with options ', JSON.stringify(requestOptions, null, 2))
   return fetch(url, requestOptions).then(parseResponse)
 }
 export function parseResponse (response) {

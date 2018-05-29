@@ -83,6 +83,10 @@ module.exports = (Sequelize, dbContext) => {
     userStatusId: {
       type: Sequelize.INTEGER,
       allowNull: true
+    },
+    locationCodeId: {
+      type: Sequelize.INTEGER,
+      allowNull: true
     }
   }, {
     tableName: 'UserAccounts',
