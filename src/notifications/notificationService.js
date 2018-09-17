@@ -1,6 +1,7 @@
 import Promise from 'bluebird'
 import Sequelize from 'sequelize'
 import mime from 'mime-types'
+import uuid from 'uuid/v4'
 import HubDatabase from '../hub/db'
 
 let _db
@@ -192,28 +193,29 @@ export function queueNotification (to, type, body, callback) {
     })
 
     const sendDate = body.sendAt || Date.now()
+    const notificationId = uuid()
 
     _logger('Creating item in Notification Queue')
 
-    return _db.NotificationQueue.create({
-      stateId: 1, // Queued
-      sendDate: sendDate,
-      message: JSON.stringify(notification)
-    })
-    .then((queueItem) => {
-      return saveNotificationAttachments(queueItem.notificationId, body.attachments)
-        .then(() => queueItem)
-    })
-    .then((queueItem) => {
-      _logger(queueItem.toJSON())
-      callback(null, queueItem.notificationId)
-      return queueItem.notificationId
-    })
-    .catch((error) => {
-      _logger(`Error: ${JSON.stringify(error)}`)
-      callback(error)
-      throw error
-    })
+    return saveNotificationAttachments(notificationId, body.attachments)
+      .then(() => {
+        return _db.NotificationQueue.create({
+          notificationId: notificationId,
+          stateId: 1, // Queued
+          sendDate: sendDate,
+          message: JSON.stringify(notification)
+        })
+      })
+      .then((queueItem) => {
+        _logger(queueItem.toJSON())
+        callback(null, queueItem.notificationId)
+        return queueItem.notificationId
+      })
+      .catch((error) => {
+        _logger(`Error: ${JSON.stringify(error)}`)
+        callback(error)
+        throw error
+      })
   } catch (e) {
     callback(e)
     return Promise.reject(e)
