@@ -17,7 +17,7 @@ export default function uploadMigrationFile (migrationFile, imsPackage, replacem
         replacements: JSON.stringify(replacements)
       }
 
-      const url = `${imsPackage.hubUrl}${PACKAGE_MIGRATION_ENDPOINT}`.replace('//', '/').replace('http:/', 'http://')
+      const url = `${imsPackage.hubUrl}${PACKAGE_MIGRATION_ENDPOINT}`.replace('//', '/').replace(':/', '://')
       const headers = {}
       headers[Constants.RequestHeaders.PackageId] = imsPackage.packageId
       headers[Constants.RequestHeaders.PackageSecret] = imsPackage.secret
