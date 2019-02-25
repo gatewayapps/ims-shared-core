@@ -14,7 +14,7 @@ export function scheduleTasks (tasks, serverRoot) {
 
       try {
         logger.info(`Task ${t.name} module path: ${modulePath}, CWD: ${serverRoot}`)
-        const cp = childProcess.fork(modulePath, [], { cwd: serverRoot, stdio: 'inherit' })
+        const cp = childProcess.fork(modulePath, [], { cwd: serverRoot, stdio: 'inherit', execArgv: ['--inspect=0'] })
         cp.on('exit', (code, signal) => {
           if (code === 0) {
             logger.info(`Task ${t.name} completed succesfully`)
