@@ -8,16 +8,16 @@ export function scheduleTasks (tasks, serverRoot) {
   tasks = tasks || []
   tasks.map((t) => {
     schedule.scheduleJob(t.schedule, () => {
-      logger.info(`Starting Task: ${t.name}`)
+      logger.trace(`Starting Task: ${t.name}`)
 
       const modulePath = path.join(serverRoot, t.modulePath)
 
       try {
-        logger.info(`Task ${t.name} module path: ${modulePath}, CWD: ${serverRoot}`)
+        logger.trace(`Task ${t.name} module path: ${modulePath}, CWD: ${serverRoot}`)
         const cp = childProcess.fork(modulePath, [], { cwd: serverRoot, stdio: 'inherit', execArgv: ['--inspect=0'] })
         cp.on('exit', (code, signal) => {
           if (code === 0) {
-            logger.info(`Task ${t.name} completed succesfully`)
+            logger.trace(`Task ${t.name} completed succesfully`)
           } else {
             if (code !== null) {
               logger.warn(`Task ${t.name} exited with a code ${code}`)

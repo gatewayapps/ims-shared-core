@@ -21,7 +21,7 @@ import {
 import { createNotificationService } from 'ims-shared-core/notifications'
 
 createLogger(imsConfig)
-createNotificationService(imsConfig, { log: logger.debug })
+createNotificationService(imsConfig, { log: logger.trace })
 ```
 ### Sending Notifications
 

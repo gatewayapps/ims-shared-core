@@ -76,14 +76,14 @@ export function createLogger (config, subFileName) {
     if (req.context) {
       user = `${req.context.displayName}/${req.context.userAccountId}`
     }
-    loggerInstance.info(`[API CALL]: (${user}) - ${req.method} ${fullUrl(req)}`)
+    loggerInstance.trace(`[API CALL]: (${user}) - ${req.method} ${fullUrl(req)}`)
     if (req.body) {
-      loggerInstance.info(`[REQUEST BODY]`, req.body)
+      loggerInstance.trace(`[REQUEST BODY]`, req.body)
     }
   }
 
   loggerInstance.url = (message) => {
-    loggerInstance.info(`[URL] - ${message}`)
+    loggerInstance.trace(`[URL] - ${message}`)
   }
 }
 

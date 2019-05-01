@@ -85,7 +85,7 @@ export default class Host {
     }
     app.use(cors(corsOptions))
     if (process.env.NODE_ENV === 'development') {
-      logger.info('In development mode, so adding middleware to add HUB_URL to cookies')
+      logger.trace('In development mode, so adding middleware to add HUB_URL to cookies')
       app.use((req, res, next) => {
         res.cookie('HUB_URL', this.serverConfig.hubUrl, { maxAge: COOKIE_EXPIRY })
         return next()
@@ -117,8 +117,8 @@ export default class Host {
           if (this.options.migrationFilePath) {
             uploadMigrationFile(this.options.migrationFilePath, this.serverConfig, this.options.migrationReplacements).then((result) => {
               if (result.success) {
-                logger.info('Migration succeeded')
-                logger.info(JSON.stringify(result, null, 2))
+                logger.trace('Migration succeeded')
+                logger.trace(JSON.stringify(result, null, 2))
               } else {
                 logger.error('Migration failed')
                 logger.error(JSON.stringify(result, null, 2))

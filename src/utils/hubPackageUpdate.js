@@ -24,7 +24,7 @@ export default function hubPackageUpdate (hubUrl, packageSecret, imsConfig) {
 function attemptPackageUpdate (resolve, reject, hubUrl, packageSecret, imsConfig) {
   try {
     if (isLoggerCreated()) {
-      logger.debug(`Attempting package update in hub.  Attempt: #${hubAttempt}`)
+      logger.trace(`Attempting package update in hub.  Attempt: #${hubAttempt}`)
     }
     const payloadSignature = createSignature(imsConfig, packageSecret)
     const postData = {
@@ -49,7 +49,7 @@ function attemptPackageUpdate (resolve, reject, hubUrl, packageSecret, imsConfig
         }
         clearInterval(HUB_PACKAGE_UPDATE_INTERVAL)
         if (isLoggerCreated()) {
-          logger.debug(`Package succesfully updated.`)
+          logger.trace(`Package succesfully updated.`)
         }
         resolve(true)
       }).catch((err) => {
