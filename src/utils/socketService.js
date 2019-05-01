@@ -11,7 +11,7 @@ let _fileStoragePath
 export function prepareSocketService (packageId, serverConfig) {
   _packageId = packageId
   _fileStoragePath = serverConfig.fileStoragePath
-  logger.debug(`Connecting to socket service at ${process.env.SOCKET_SERVICE_URL}`)
+  logger.trace(`Connecting to socket service at ${process.env.SOCKET_SERVICE_URL}`)
   _packageSocket = io(`${process.env.SOCKET_SERVICE_URL}/package`)
 
   const packageInfo = {
@@ -19,7 +19,7 @@ export function prepareSocketService (packageId, serverConfig) {
     url: serverConfig.baseUrl
   }
 
-  logger.debug(`Registering package ${_packageId} with socket service`, packageInfo)
+  logger.trace(`Registering package ${_packageId} with socket service`, packageInfo)
   _packageSocket.emit('register', packageInfo)
 
   sendHeartbeat()
@@ -42,7 +42,7 @@ function sendHeartbeat () {
       }
     }
 
-    logger.debug(`Sending heartbeat for ${_packageId} to socket service`, payload)
+    logger.trace(`Sending heartbeat for ${_packageId} to socket service`, payload)
     _packageSocket.emit('heartbeat', payload)
   })
 }
