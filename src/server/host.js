@@ -1,19 +1,24 @@
-import express from 'express'
-import path from 'path'
-import { scheduleTasks } from '../utils/taskScheduler'
-const sockets = require('../sockets')
-import cors from 'cors'
-import cookieParser from 'cookie-parser'
-import compression from 'compression'
-import Api from './api'
-import { createCache } from '../utils/cache'
-import { prepareSocketService } from '../utils/socketService'
-import { createLogger, default as logger } from '../logger'
-import { createNotificationService } from '../notifications/notificationService'
-import { createSettingService } from '../hub/services/settingService'
-import { hubPackageUpdate, uploadMigrationFile, prepareRequest, prepareEventPublisher } from '../utils'
+import express from "express";
+import path from "path";
+import { scheduleTasks } from "../utils/taskScheduler";
+const sockets = require("../sockets");
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import compression from "compression";
+import Api from "./api";
+import { createCache } from "../utils/cache";
+import { prepareSocketService } from "../utils/socketService";
+import { createLogger, default as logger } from "../logger";
+import { createNotificationService } from "../notifications/notificationService";
+import { createSettingService } from "../hub/services/settingService";
+import {
+  hubPackageUpdate,
+  uploadMigrationFile,
+  prepareRequest,
+  prepareEventPublisher
+} from "../utils";
 
-const COOKIE_EXPIRY = 2147483647
+const COOKIE_EXPIRY = 2147483647;
 
 /*
   Options
@@ -22,6 +27,7 @@ const COOKIE_EXPIRY = 2147483647
   - onGetRawStreamRequest: (id)
   - onBadgesRequest: (userContext) => Promise<number>
   - onUnhandledException: (err)
+  - disableIndexRewrite: boolean = false
   - swagger: {
     appRoot: path to /dist/server
     configDir: relative path from appRoot to api/swagger
@@ -41,107 +47,129 @@ const COOKIE_EXPIRY = 2147483647
 */
 
 export default class Host {
-  constructor (serverConfig, packageDef, options) {
-    this.serverConfig = serverConfig
-    this.packageDef = packageDef
-    this.options = options
-    this.onUnhandledException = options.onUnhandledException
+  constructor(serverConfig, packageDef, options) {
+    this.serverConfig = serverConfig;
+    this.packageDef = packageDef;
+    this.options = options;
+    this.onUnhandledException = options.onUnhandledException;
 
     // Create logger and notification service
-    createCache(options.cacheOptions)
-    createLogger(serverConfig)
-    createNotificationService(serverConfig)
-    createSettingService(serverConfig)
-    prepareEventPublisher(this.serverConfig.mongoConnectionString, this.serverConfig.hubUrl, packageDef.packageId)
-    prepareSocketService(packageDef.packageId, serverConfig)
+    createCache(options.cacheOptions);
+    createLogger(serverConfig);
+    createNotificationService(serverConfig);
+    createSettingService(serverConfig);
+    prepareEventPublisher(
+      this.serverConfig.mongoConnectionString,
+      this.serverConfig.hubUrl,
+      packageDef.packageId
+    );
+    prepareSocketService(packageDef.packageId, serverConfig);
 
     // To handle packages that don't provide serverRoot in serverConfig
-    const oldProcessCWD = path.join(process.cwd(), 'dist/server')
+    const oldProcessCWD = path.join(process.cwd(), "dist/server");
 
-    scheduleTasks(packageDef.tasks, serverConfig.serverRoot || oldProcessCWD)
+    scheduleTasks(packageDef.tasks, serverConfig.serverRoot || oldProcessCWD);
     // wire up exception handling
-    process.on('uncaughtException', this.handleException)
+    process.on("uncaughtException", this.handleException);
 
-    this.handleException = this.handleException.bind(this)
+    this.handleException = this.handleException.bind(this);
   }
 
-  handleException (err) {
+  handleException(err) {
     if (err) {
       if (this.onUnhandledException) {
-        this.onUnhandledException(err)
+        this.onUnhandledException(err);
       }
-      logger.error(err)
-      process.exit(1)
+      logger.error(err);
+      process.exit(1);
     }
   }
 
-  start () {
-    const app = express()
+  start() {
+    const app = express();
 
-    app.use(cookieParser())
-    app.use(compression())
+    app.use(cookieParser());
+    app.use(compression());
     const corsOptions = {
       optionsSuccessStatus: 200
-    }
-    app.use(cors(corsOptions))
-    if (process.env.NODE_ENV === 'development') {
-      logger.trace('In development mode, so adding middleware to add HUB_URL to cookies')
+    };
+    app.use(cors(corsOptions));
+    if (process.env.NODE_ENV === "development") {
+      logger.trace("In development mode, so adding middleware to add HUB_URL to cookies");
       app.use((req, res, next) => {
-        res.cookie('HUB_URL', this.serverConfig.hubUrl, { maxAge: COOKIE_EXPIRY })
-        return next()
-      })
+        res.cookie("HUB_URL", this.serverConfig.hubUrl, { maxAge: COOKIE_EXPIRY });
+        return next();
+      });
     }
 
-    app.get('/authenticate', this.processAuthenticationRequest.bind(this))
+    app.get("/authenticate", this.processAuthenticationRequest.bind(this));
 
-    const api = new Api(this.serverConfig, this.options.swagger, this.options.middlewares, {
-      onFileUploadRequest : this.options.onFileUploadRequest,
-      onFileDownloadRequest: this.options.onFileDownloadRequest || this.defaultFileDownloadRequestHandler,
-      onGetRawStreamRequest: this.options.onGetRawStreamRequest || this.defaultGetRawStreamHandler,
-      onBadgesRequest: this.options.onBadgesRequest || this.defaultBadgesRequestHandler
-    }, this.handleException, this.options.contractsDirectory, this.options.activitiesDirectory)
+    const api = new Api(
+      this.serverConfig,
+      this.options.swagger,
+      this.options.middlewares,
+      {
+        onFileUploadRequest: this.options.onFileUploadRequest,
+        onFileDownloadRequest:
+          this.options.onFileDownloadRequest || this.defaultFileDownloadRequestHandler,
+        onGetRawStreamRequest:
+          this.options.onGetRawStreamRequest || this.defaultGetRawStreamHandler,
+        onBadgesRequest: this.options.onBadgesRequest || this.defaultBadgesRequestHandler
+      },
+      this.handleException,
+      this.options.contractsDirectory,
+      this.options.activitiesDirectory
+    );
 
     api.createApp((err, apiApp) => {
       if (err) {
-        this.handleException(err)
+        this.handleException(err);
       } else {
-        app.use(apiApp)
+        app.use(apiApp);
 
-        app.use(require('connect-history-api-fallback')())
+        if (!this.options.disableIndexRewrite) {
+          app.use(require("connect-history-api-fallback")());
+        }
 
-        this.options.onInitialized(null, app)
+        this.options.onInitialized(null, app);
 
-        hubPackageUpdate(this.serverConfig.hubUrl, this.serverConfig.secret, this.packageDef).then(() => {
-          prepareRequest(this.serverConfig.hubUrl, this.serverConfig.secret, this.packageDef)
-          sockets.use(this.serverConfig)
-          if (this.options.migrationFilePath) {
-            uploadMigrationFile(this.options.migrationFilePath, this.serverConfig, this.options.migrationReplacements).then((result) => {
-              if (result.success) {
-                logger.trace('Migration succeeded')
-                logger.trace(JSON.stringify(result, null, 2))
-              } else {
-                logger.error('Migration failed')
-                logger.error(JSON.stringify(result, null, 2))
-              }
-            })
-          }
-        }).catch(this.handleException)
+        hubPackageUpdate(this.serverConfig.hubUrl, this.serverConfig.secret, this.packageDef)
+          .then(() => {
+            prepareRequest(this.serverConfig.hubUrl, this.serverConfig.secret, this.packageDef);
+            sockets.use(this.serverConfig);
+            if (this.options.migrationFilePath) {
+              uploadMigrationFile(
+                this.options.migrationFilePath,
+                this.serverConfig,
+                this.options.migrationReplacements
+              ).then(result => {
+                if (result.success) {
+                  logger.trace("Migration succeeded");
+                  logger.trace(JSON.stringify(result, null, 2));
+                } else {
+                  logger.error("Migration failed");
+                  logger.error(JSON.stringify(result, null, 2));
+                }
+              });
+            }
+          })
+          .catch(this.handleException);
       }
-    })
+    });
   }
 
-  defaultBadgesRequestHandler (req, res, next) {
-    res.json({ success: false, reason: 'Not Implemented' })
+  defaultBadgesRequestHandler(req, res, next) {
+    res.json({ success: false, reason: "Not Implemented" });
   }
-  defaultFileDownloadRequestHandler (req, res, next) {
-    res.status(404).send()
+  defaultFileDownloadRequestHandler(req, res, next) {
+    res.status(404).send();
   }
-  defaultGetRawStreamHandler (req, res) {
-    return Promise.reject(new Error('Get raw stream handler not defined'))
+  defaultGetRawStreamHandler(req, res) {
+    return Promise.reject(new Error("Get raw stream handler not defined"));
   }
 
-  processAuthenticationRequest (req, res, next) {
-    res.redirect(req.query.return || '/')
-    res.send()
+  processAuthenticationRequest(req, res, next) {
+    res.redirect(req.query.return || "/");
+    res.send();
   }
 }
