@@ -47,27 +47,26 @@ export default class Api {
           package: this.defaultSecurityHandler.bind(this)
         };
         this.swaggerConfig = swaggerConfig;
+      } else {
+        this.authenticationMiddleware = createAuthenticationMiddleware(
+          serverConfig
+        ).defaultMiddleware;
       }
       this.handleError = this.handleError.bind(this);
       this.createApp = this.createApp.bind(this);
     } catch (err) {
       this.handleError(err);
-    } 
+    }
   }
 
   defaultSecurityHandler(req, authOrSecDef, scopesOrApiKey, next) {
-    return this.authenticationMiddleware(
-      req,
-      authOrSecDef,
-      scopesOrApiKey,
-      error => {
-        logger.api(req);
-        if (error) {
-          logger.error({ err: error });
-        }
-        next(error);
+    return this.authenticationMiddleware(req, authOrSecDef, scopesOrApiKey, error => {
+      logger.api(req);
+      if (error) {
+        logger.error({ err: error });
       }
-    );
+      next(error);
+    });
   }
 
   handleError(err) {
@@ -113,20 +112,11 @@ export default class Api {
     }
   }
 
-  connectMiddlewares(
-    app,
-    middlewares,
-    contractsDirectory,
-    activitiesDirectory
-  ) {
+  connectMiddlewares(app, middlewares, contractsDirectory, activitiesDirectory) {
     // If middlewares are provided, use them here
     if (middlewares && Array.isArray(middlewares)) {
       for (var i = 0; i < middlewares.length; i++) {
-        if (
-          middlewares[i].route &&
-          middlewares[i].handler &&
-          middlewares[i].method
-        ) {
+        if (middlewares[i].route && middlewares[i].handler && middlewares[i].method) {
           const method = middlewares[i].method;
           if (method === "GET") {
             app.get(middlewares[i].route, middlewares[i].handler);
@@ -181,14 +171,8 @@ export default class Api {
     });
     PermissionCheckMiddleware(app, this.serverConfig);
 
-    contractsDirectory = getAbsolutePath(
-      contractsDirectory,
-      this.serverConfig.serverRoot
-    );
-    activitiesDirectory = getAbsolutePath(
-      activitiesDirectory,
-      this.serverConfig.serverRoot
-    );
+    contractsDirectory = getAbsolutePath(contractsDirectory, this.serverConfig.serverRoot);
+    activitiesDirectory = getAbsolutePath(activitiesDirectory, this.serverConfig.serverRoot);
 
     if (contractsDirectory && fs.existsSync(contractsDirectory)) {
       ContractMiddleware(app, this.serverConfig, contractsDirectory);
