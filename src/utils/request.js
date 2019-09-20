@@ -1,196 +1,202 @@
-import fetch from 'isomorphic-fetch'
-import Constants from '../lib/constants'
-import semver from 'semver'
-import jwt from 'jsonwebtoken'
-let accessTokens = {}
-let PackageInformation
+import fetch from "isomorphic-fetch";
+import Constants from "../lib/constants";
+import semver from "semver";
+import jwt from "jsonwebtoken";
+let accessTokens = {};
+let PackageInformation;
 
-export function createRequestHeader (packageId) {
+export function createRequestHeader(packageId) {
   return {
-    'accept': 'application/json',
-    'content-type': 'application/json',
+    accept: "application/json",
+    "content-type": "application/json",
     [Constants.RequestHeaders.PackageId]: packageId
-  }
+  };
 }
 
-export function createAuthenticatedRequestHeader (packageId, accessToken) {
+export function createAuthenticatedRequestHeader(packageId, accessToken) {
   return Object.assign(createRequestHeader(packageId), {
     [Constants.RequestHeaders.Authorization]: `JWT ${accessToken}`
-  })
+  });
 }
 
-export function isPackageAvailable (packageId) {
-  return !!accessTokens[packageId]
+export function isPackageAvailable(packageId) {
+  return !!accessTokens[packageId];
 }
 
-export function getPackageUrl (packageId) {
+export function getPackageUrl(packageId) {
   if (isPackageAvailable(packageId)) {
-    return accessTokens[packageId].url
+    return accessTokens[packageId].url;
   } else {
-    return undefined
+    return undefined;
   }
 }
 
-export function prepareRequest (hubUrl, packageSecret, packageInformation) {
-  PackageInformation = packageInformation
+export function prepareRequest(hubUrl, packageSecret, packageInformation) {
+  PackageInformation = packageInformation;
   if (PackageInformation.packageDependencies) {
     if (Array.isArray(packageInformation.packageDependencies)) {
-      console.warn('Providing package dependencies as an array of strings is deprecated.  Please move to the new object structure before upgrading to ims-shared-core>10.0.0')
+      console.warn(
+        "Providing package dependencies as an array of strings is deprecated.  Please move to the new object structure before upgrading to ims-shared-core>10.0.0"
+      );
     } else {
       if (!PackageInformation.packageDependencies[packageInformation.packageId]) {
-        PackageInformation.packageDependencies[packageInformation.packageId] = { required: true }
+        PackageInformation.packageDependencies[packageInformation.packageId] = { required: true };
       }
     }
 
     const packageIds = Array.isArray(PackageInformation.packageDependencies)
-    ? PackageInformation.packageDependencies
-    : Object.keys(PackageInformation.packageDependencies)
+      ? PackageInformation.packageDependencies
+      : Object.keys(PackageInformation.packageDependencies);
 
-    if (!packageIds.find((p) => p.packageId === packageInformation.packageId)) {
-      packageIds.push(packageInformation.packageId)
+    if (!packageIds.find(p => p.packageId === packageInformation.packageId)) {
+      packageIds.push(packageInformation.packageId);
     }
 
-    return Promise.all(packageIds.map((p) => {
-      const url = combineUrlParts(hubUrl, `packages/${p}/authorize`)
-      const headers = {
-        [Constants.RequestHeaders.PackageSecret]: packageSecret,
-        [Constants.RequestHeaders.PackageId]: PackageInformation.packageId
-      }
-      return request(url, { authenticate: false, headers }).then((response) => {
-        const constraints = Array.isArray(PackageInformation.packageDependencies)
-        ? { required: false }
-        : PackageInformation.packageDependencies[p]
-        handlePackageResponse(p, constraints, response)
+    return Promise.all(
+      packageIds.map(p => {
+        const url = combineUrlParts(hubUrl, `packages/${p}/authorize`);
+        const headers = {
+          [Constants.RequestHeaders.PackageSecret]: packageSecret,
+          [Constants.RequestHeaders.PackageId]: PackageInformation.packageId
+        };
+        return request(url, { authenticate: false, headers }).then(response => {
+          const constraints = Array.isArray(PackageInformation.packageDependencies)
+            ? { required: false }
+            : PackageInformation.packageDependencies[p];
+          handlePackageResponse(p, constraints, response);
+        });
       })
-    }))
+    );
   }
 }
 
-function handlePackageResponse (packageId, constraints, response) {
-  let verified = false
-  let packageInfo
+function handlePackageResponse(packageId, constraints, response) {
+  let verified = false;
+  let packageInfo;
   if (response.success) {
-    packageInfo = jwt.decode(response.accessToken)
+    packageInfo = jwt.decode(response.accessToken);
     if (constraints.version) {
       if (semver.satisfies(packageInfo.targetPackage.version, constraints.version)) {
-        verified = true
+        verified = true;
       } else {
         if (!constraints.required) {
           console.warn(`An access token for ${packageId} was obtained, but the installed version: ${packageInfo.targetPackage.version}
-          does not match the requested version: ${constraints.version} and the package may not function as expected.`)
-          verified = true
+          does not match the requested version: ${constraints.version} and the package may not function as expected.`);
+          verified = true;
         } else {
-          console.error(`An access token for ${packageId} was obtained, but the installed version (${packageInfo.targetPackage.version}) did not match the requested version (${constraints.version}).`)
+          console.error(
+            `An access token for ${packageId} was obtained, but the installed version (${packageInfo.targetPackage.version}) did not match the requested version (${constraints.version}).`
+          );
         }
       }
     } else {
-      verified = true
+      verified = true;
     }
   }
   if (verified) {
     accessTokens[packageId] = {
       url: packageInfo.targetPackage.url,
-      packageId:packageId,
+      packageId: packageId,
       accessToken: response.accessToken,
       version: packageInfo.targetPackage.version
-    }
-  } else {
-    if (constraints.required === true) {
-      throw new Error(`An access token for required package ${packageId} could not be obtained.  Please verify ${packageId} is installed.`)
-    } else {
-      console.log(`Optional package dependency ${packageId} is not installed.`)
-    }
+    };
   }
 }
 
-export default function request (url, options) {
+export default function request(url, options) {
   try {
-    verifyInitialized()
+    verifyInitialized();
 
-    const opts = prepareOptions(options)
+    const opts = prepareOptions(options);
 
     if (opts.authenticate) {
-      return makeAuthenticatedRequest(url, opts.requestOptions)
+      return makeAuthenticatedRequest(url, opts.requestOptions);
     } else {
-      return makeUnauthenticatedRequest(url, opts.requestOptions)
+      return makeUnauthenticatedRequest(url, opts.requestOptions);
     }
   } catch (e) {
-    return Promise.reject(e)
+    return Promise.reject(e);
   }
 }
 
-function verifyInitialized () {
-  return (PackageInformation && PackageInformation.packageId)
+function verifyInitialized() {
+  return PackageInformation && PackageInformation.packageId;
 }
 
-export function combineUrlParts (base, endpoint) {
-  if (endpoint.indexOf('/') !== 0) {
-    endpoint = '/' + endpoint
+export function combineUrlParts(base, endpoint) {
+  if (endpoint.indexOf("/") !== 0) {
+    endpoint = "/" + endpoint;
   }
-  if (base.lastIndexOf('/') === base.length - 1) {
-    base = base.substr(0, base.length - 1)
+  if (base.lastIndexOf("/") === base.length - 1) {
+    base = base.substr(0, base.length - 1);
   }
-  return `${base}${endpoint}`
+  return `${base}${endpoint}`;
 }
 
-function getPackage (packageId) {
-  return accessTokens[packageId]
+function getPackage(packageId) {
+  return accessTokens[packageId];
 }
-function getAccessTokenForPackage (packageId) {
-  const pkg = getPackage(packageId)
+function getAccessTokenForPackage(packageId) {
+  const pkg = getPackage(packageId);
   if (pkg) {
-    return pkg.accessToken
+    return pkg.accessToken;
   } else {
-    console.error('Package not present in accessTokens', accessTokens)
-    return undefined
+    console.error("Package not present in accessTokens", accessTokens);
+    return undefined;
   }
 }
 
-function makeAuthenticatedRequest (url, requestOptions) {
+function makeAuthenticatedRequest(url, requestOptions) {
   if (requestOptions.packageId) {
-    const pkg = getPackage(requestOptions.packageId)
+    const pkg = getPackage(requestOptions.packageId);
     if (pkg) {
-      const accessToken = getAccessTokenForPackage(pkg.packageId)
-      requestOptions.headers = createAuthenticatedRequestHeader(requestOptions.packageId, accessToken)
+      const accessToken = getAccessTokenForPackage(pkg.packageId);
+      requestOptions.headers = createAuthenticatedRequestHeader(
+        requestOptions.packageId,
+        accessToken
+      );
 
-      return makeRequest(combineUrlParts(pkg.url, url), requestOptions)
+      return makeRequest(combineUrlParts(pkg.url, url), requestOptions);
     } else {
-      return Promise.resolve({ success: false, message: `An access token could not be obtained for ${requestOptions.packageId}` })
+      return Promise.resolve({
+        success: false,
+        message: `An access token could not be obtained for ${requestOptions.packageId}`
+      });
       // throw new Error(`Package ${requestOptions.packageId} was not found in ${accessTokens}  Make sure you have added the package to your packageDependencies`)
     }
   }
 }
-function makeUnauthenticatedRequest (url, requestOptions) {
-  return makeRequest(url, requestOptions)
+function makeUnauthenticatedRequest(url, requestOptions) {
+  return makeRequest(url, requestOptions);
 }
 
-function makeRequest (url, requestOptions) {
-  return fetch(url, requestOptions).then(parseResponse)
+function makeRequest(url, requestOptions) {
+  return fetch(url, requestOptions).then(parseResponse);
 }
-export function parseResponse (response) {
+export function parseResponse(response) {
   if (!response || response.status >= 500) {
-    throw new Error('Response received a server error')
+    throw new Error("Response received a server error");
   }
-  var contentType = response.headers.get('content-type')
-  if (contentType && contentType.indexOf('application/json') !== -1) {
-    return response.json()
+  var contentType = response.headers.get("content-type");
+  if (contentType && contentType.indexOf("application/json") !== -1) {
+    return response.json();
   } else {
-    return response.status === 200
+    return response.status === 200;
   }
 }
-function prepareOptions (options = {}) {
-  const opts = Object.assign({}, options)
+function prepareOptions(options = {}) {
+  const opts = Object.assign({}, options);
 
   if (!opts.method) {
-    opts.method = 'GET'
+    opts.method = "GET";
   }
 
   if (!opts.credentials) {
-    opts.credentials = 'same-origin'
+    opts.credentials = "same-origin";
   }
 
   if (opts.authenticate === undefined) {
-    opts.authenticate = true
+    opts.authenticate = true;
   }
 
   const requestOptions = {
@@ -199,19 +205,19 @@ function prepareOptions (options = {}) {
     packageId: opts.packageId,
     body: opts.body,
     headers: {
-      'content-type': 'application/json',
-      'accept': 'application/json'
+      "content-type": "application/json",
+      accept: "application/json"
     }
-  }
+  };
   if (opts.headers) {
-    Object.assign(requestOptions.headers, opts.headers)
+    Object.assign(requestOptions.headers, opts.headers);
   }
 
   if (!opts.requestOptions) {
-    opts.requestOptions = requestOptions
+    opts.requestOptions = requestOptions;
   } else {
-    opts.requestOptions = Object.assign({}, requestOptions, opts.requestOptions)
+    opts.requestOptions = Object.assign({}, requestOptions, opts.requestOptions);
   }
 
-  return opts
+  return opts;
 }
