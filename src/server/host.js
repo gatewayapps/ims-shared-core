@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { scheduleTasks } from "../utils/taskScheduler";
-const sockets = require("../sockets");
+
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import compression from "compression";
@@ -11,12 +11,7 @@ import { prepareSocketService } from "../utils/socketService";
 import { createLogger, default as logger } from "../logger";
 import { createNotificationService } from "../notifications/notificationService";
 import { createSettingService } from "../hub/services/settingService";
-import {
-  hubPackageUpdate,
-  uploadMigrationFile,
-  prepareRequest,
-  prepareEventPublisher
-} from "../utils";
+import { prepareRequest, prepareEventPublisher } from "../utils";
 
 const COOKIE_EXPIRY = 2147483647;
 
@@ -91,13 +86,17 @@ export default class Host {
     app.use(cookieParser());
     app.use(compression());
     const corsOptions = {
-      optionsSuccessStatus: 200
+      optionsSuccessStatus: 200,
     };
     app.use(cors(corsOptions));
     if (process.env.NODE_ENV === "development") {
-      logger.trace("In development mode, so adding middleware to add HUB_URL to cookies");
+      logger.trace(
+        "In development mode, so adding middleware to add HUB_URL to cookies"
+      );
       app.use((req, res, next) => {
-        res.cookie("HUB_URL", this.serverConfig.hubUrl, { maxAge: COOKIE_EXPIRY });
+        res.cookie("HUB_URL", this.serverConfig.hubUrl, {
+          maxAge: COOKIE_EXPIRY,
+        });
         return next();
       });
     }
@@ -111,10 +110,12 @@ export default class Host {
       {
         onFileUploadRequest: this.options.onFileUploadRequest,
         onFileDownloadRequest:
-          this.options.onFileDownloadRequest || this.defaultFileDownloadRequestHandler,
+          this.options.onFileDownloadRequest ||
+          this.defaultFileDownloadRequestHandler,
         onGetRawStreamRequest:
           this.options.onGetRawStreamRequest || this.defaultGetRawStreamHandler,
-        onBadgesRequest: this.options.onBadgesRequest || this.defaultBadgesRequestHandler
+        onBadgesRequest:
+          this.options.onBadgesRequest || this.defaultBadgesRequestHandler,
       },
       this.handleException,
       this.options.contractsDirectory,
@@ -133,27 +134,11 @@ export default class Host {
 
         this.options.onInitialized(null, app);
 
-        hubPackageUpdate(this.serverConfig.hubUrl, this.serverConfig.secret, this.packageDef)
-          .then(() => {
-            prepareRequest(this.serverConfig.hubUrl, this.serverConfig.secret, this.packageDef);
-            sockets.use(this.serverConfig);
-            if (this.options.migrationFilePath) {
-              uploadMigrationFile(
-                this.options.migrationFilePath,
-                this.serverConfig,
-                this.options.migrationReplacements
-              ).then(result => {
-                if (result.success) {
-                  logger.trace("Migration succeeded");
-                  logger.trace(JSON.stringify(result, null, 2));
-                } else {
-                  logger.error("Migration failed");
-                  logger.error(JSON.stringify(result, null, 2));
-                }
-              });
-            }
-          })
-          .catch(this.handleException);
+        prepareRequest(
+          this.serverConfig.hubUrl,
+          this.serverConfig.secret,
+          this.packageDef
+        );
       }
     });
   }
