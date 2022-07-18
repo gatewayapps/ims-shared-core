@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import express from "express";
-import SwaggerExpress from "swagger-express-mw";
+
 import logger from "../logger";
 import constants from "../lib/constants";
 import createAuthenticationMiddleware from "../middlewares/Authentication";
@@ -22,7 +22,6 @@ import ImageCache from "../middlewares/ImageCache";
 export default class Api {
   constructor(
     serverConfig,
-    swaggerConfig,
     middlewares,
     requestHandlers,
     onException,
@@ -37,21 +36,9 @@ export default class Api {
     this.activitiesDirectory = activitiesDirectory;
 
     try {
-      if (swaggerConfig) {
-        this.verifySwaggerConfig(swaggerConfig);
-        this.authenticationMiddleware = createAuthenticationMiddleware(
-          serverConfig
-        ).swaggerMiddleware;
-        swaggerConfig.securityHandlers = {
-          token: this.defaultSecurityHandler.bind(this),
-          package: this.defaultSecurityHandler.bind(this)
-        };
-        this.swaggerConfig = swaggerConfig;
-      } else {
-        this.authenticationMiddleware = createAuthenticationMiddleware(
-          serverConfig
-        ).defaultMiddleware;
-      }
+      this.authenticationMiddleware =
+        createAuthenticationMiddleware(serverConfig).defaultMiddleware;
+
       this.handleError = this.handleError.bind(this);
       this.createApp = this.createApp.bind(this);
     } catch (err) {
@@ -60,13 +47,18 @@ export default class Api {
   }
 
   defaultSecurityHandler(req, authOrSecDef, scopesOrApiKey, next) {
-    return this.authenticationMiddleware(req, authOrSecDef, scopesOrApiKey, error => {
-      logger.api(req);
-      if (error) {
-        logger.error({ err: error });
+    return this.authenticationMiddleware(
+      req,
+      authOrSecDef,
+      scopesOrApiKey,
+      (error) => {
+        logger.api(req);
+        if (error) {
+          logger.error({ err: error });
+        }
+        next(error);
       }
-      next(error);
-    });
+    );
   }
 
   handleError(err) {
@@ -82,41 +74,30 @@ export default class Api {
   }
 
   createApp(cb) {
-    if (this.swaggerConfig) {
-      SwaggerExpress.create(this.swaggerConfig, (err, swaggerExpress) => {
-        if (err) {
-          this.handleError(err);
-          return cb(err);
-        }
-
-        const app = express();
-        this.connectMiddlewares(
-          app,
-          this.middlewares,
-          this.contractsDirectory,
-          this.activitiesDirectory
-        );
-
-        swaggerExpress.register(app);
-        cb(null, app);
-      });
-    } else {
-      const app = express();
-      this.connectMiddlewares(
-        app,
-        this.middlewares,
-        this.contractsDirectory,
-        this.activitiesDirectory
-      );
-      cb(null, app);
-    }
+    const app = express();
+    this.connectMiddlewares(
+      app,
+      this.middlewares,
+      this.contractsDirectory,
+      this.activitiesDirectory
+    );
+    cb(null, app);
   }
 
-  connectMiddlewares(app, middlewares, contractsDirectory, activitiesDirectory) {
+  connectMiddlewares(
+    app,
+    middlewares,
+    contractsDirectory,
+    activitiesDirectory
+  ) {
     // If middlewares are provided, use them here
     if (middlewares && Array.isArray(middlewares)) {
       for (var i = 0; i < middlewares.length; i++) {
-        if (middlewares[i].route && middlewares[i].handler && middlewares[i].method) {
+        if (
+          middlewares[i].route &&
+          middlewares[i].handler &&
+          middlewares[i].method
+        ) {
           const method = middlewares[i].method;
           if (method === "GET") {
             app.get(middlewares[i].route, middlewares[i].handler);
@@ -135,7 +116,7 @@ export default class Api {
 
     // Connect file upload and download middlewares
     FileUploadMiddleware(app, this.serverConfig, {
-      uploadCallback: this.requestHandlers.onFileUploadRequest
+      uploadCallback: this.requestHandlers.onFileUploadRequest,
     });
     app.get("/api/download/:id", this.requestHandlers.onFileDownloadRequest);
     app.get(
@@ -150,14 +131,9 @@ export default class Api {
         cacheDir: this.serverConfig.cachePath,
         debugLogger: logger.debug,
         errorLogger: logger.error,
-        getRawStream: this.requestHandlers.onGetRawStreamRequest // attachmentService.getStreamAsync
+        getRawStream: this.requestHandlers.onGetRawStreamRequest, // attachmentService.getStreamAsync
       })
     );
-
-    // Send the swagger file if it's requested
-    app.get("/swagger", (req, res) => {
-      res.sendFile(this.swaggerConfig.swaggerFile);
-    });
 
     app.get("/api/*", (req, res, next) => {
       // Force client not to cache api get requests.
@@ -165,14 +141,20 @@ export default class Api {
       res.set({
         "Cache-Control": "private, max-age=0, no-cache",
         Pragma: "no-cache",
-        Expires: 0
+        Expires: 0,
       });
       next();
     });
     PermissionCheckMiddleware(app, this.serverConfig);
 
-    contractsDirectory = getAbsolutePath(contractsDirectory, this.serverConfig.serverRoot);
-    activitiesDirectory = getAbsolutePath(activitiesDirectory, this.serverConfig.serverRoot);
+    contractsDirectory = getAbsolutePath(
+      contractsDirectory,
+      this.serverConfig.serverRoot
+    );
+    activitiesDirectory = getAbsolutePath(
+      activitiesDirectory,
+      this.serverConfig.serverRoot
+    );
 
     if (contractsDirectory && fs.existsSync(contractsDirectory)) {
       ContractMiddleware(app, this.serverConfig, contractsDirectory);
@@ -185,21 +167,6 @@ export default class Api {
         activitiesDirectory,
         this.serverConfig.mongoConnectionString
       );
-    }
-  }
-
-  verifySwaggerConfig(swaggerConfig) {
-    if (!swaggerConfig) {
-      throw new Error("Api requires a swagger config object");
-    }
-    if (!swaggerConfig.appRoot) {
-      throw new Error("swaggerConfig.appRoot cannot be undefined or empty");
-    }
-    if (!swaggerConfig.configDir) {
-      throw new Error("swaggerConfig.configDir cannot be undefined or empty");
-    }
-    if (!swaggerConfig.swaggerFile) {
-      throw new Error("swaggerConfig.swaggerFile cannot be undefined or empty");
     }
   }
 }

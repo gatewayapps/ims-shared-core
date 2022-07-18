@@ -7,11 +7,11 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import Api from "./api";
 import { createCache } from "../utils/cache";
-import { prepareSocketService } from "../utils/socketService";
+
 import { createLogger, default as logger } from "../logger";
 import { createNotificationService } from "../notifications/notificationService";
 import { createSettingService } from "../hub/services/settingService";
-import { prepareRequest, prepareEventPublisher } from "../utils";
+import { prepareRequest } from "../utils";
 
 const COOKIE_EXPIRY = 2147483647;
 
@@ -23,11 +23,7 @@ const COOKIE_EXPIRY = 2147483647;
   - onBadgesRequest: (userContext) => Promise<number>
   - onUnhandledException: (err)
   - disableIndexRewrite: boolean = false
-  - swagger: {
-    appRoot: path to /dist/server
-    configDir: relative path from appRoot to api/swagger
-    swaggerFile: full path to swagger file
-  }
+
   - contractsDirectory: path to contracts folder that contains implementation for contracts
   - migrationFilePath: path to migration.zip file
   - migrationReplacements: object with replacement values
@@ -53,12 +49,6 @@ export default class Host {
     createLogger(serverConfig);
     createNotificationService(serverConfig);
     createSettingService(serverConfig);
-    prepareEventPublisher(
-      this.serverConfig.mongoConnectionString,
-      this.serverConfig.hubUrl,
-      packageDef.packageId
-    );
-    prepareSocketService(packageDef.packageId, serverConfig);
 
     // To handle packages that don't provide serverRoot in serverConfig
     const oldProcessCWD = path.join(process.cwd(), "dist/server");
@@ -105,7 +95,6 @@ export default class Host {
 
     const api = new Api(
       this.serverConfig,
-      this.options.swagger,
       this.options.middlewares,
       {
         onFileUploadRequest: this.options.onFileUploadRequest,
