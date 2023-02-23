@@ -47,7 +47,7 @@
     "node-cache": "^4.1.1",
     "node-schedule": "^1.2.5",
     "semver": "^5.4.1",
-    "sequelize": "^4.42.1",
+    "sequelize": "^6.28.2",
     "tedious": "^5.0.3",
     "uuid": "^3.0.1"
   },
